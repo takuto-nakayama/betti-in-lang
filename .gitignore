@@ -1,0 +1,5 @@
+notebook.ipynb
+__pycache__/
+.env
+*.pyc
+*.pyo
