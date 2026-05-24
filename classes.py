@@ -95,13 +95,13 @@ class WordManifold:
 										skeleton.append(combo[l])
 							l += 1
 
-		set_skeleton	= set(skeleton)
-		dict_skeleton	= {s:skeleton.count(s) for s in set_skeleton}
+		skeleton_item	= sorted(set(skeleton))
+		skeleton_freq	= [skeleton.count(s) for s in skeleton_item]
 
-		return dict_skeleton
+		return skeleton_item, skeleton_freq
 
 
-	def boundary(self):
+	def boundary(self, skeleton_n:list, skeleton_n1:list):
 		pass
 
 
