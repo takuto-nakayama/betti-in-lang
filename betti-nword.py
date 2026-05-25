@@ -1,22 +1,38 @@
+#	import libraries
 from classes import Text, WordManifold
+from dotenv import load_dotenv
+import csv, os
 
 
-path 	= str()  # input in CLI
-lang 	= str()  # input in CLI
-k		= int()  # input in CLI
-N		= int()  # input in CLI
+#	preproceses
+##	difines the environment variables
+load_dotenv()
+local_data	= os.environ['LOCAL_DATA']
+save_dir	= os.environ['SAVE_DIR']
+
+##	defines the input variables
+data_file_name 	= str()  # input in CLI
+lang 			= str()  # input in CLI
+k				= int()  # input in CLI
+n				= int()  # input in CLI
+save_file_name	= str()  # input in CLI
 
 
-text				= Text(path=path, lang=lang)
+#	main processes
+##	processes the text
+text				= Text(path=f'{local_data}/{data_file_name}.txt', lang=lang)
 windowed_words		= text.window_for_word(k=k)
 
-wm_words			= WordManifold(windowed=windowed_words)
-skeleton_words_n	= wm_words.skeleton(N=1)
+##	builds a word manifold to obtain the betti numbers for each dimension
+wm_words			= WordManifold(windowed=windowed_words, n=n)
+wm_words.get_ngram()
+wm_words.get_skeleton()
+wm_words.get_boundary()
+wm_words.get_betti()
 
-for n in range(1,N):
-	skeleton_words_n1	= wm_words.skeleton(N=n+1)
-	boundary_words		= wm_words.boundary(
-		skeleton_words_n,
-		skeleton_words_n1
-		)
-	skeleton_words_n = skeleton_words_n1
+
+#	result
+##	writes the results to the .csv file
+with open(f'{save_dir}/{save_file_name}.csv', 'a', newline='') as f:
+	writer = csv.writer(f)
+	writer.writerow([lang]+wm_words.betti)

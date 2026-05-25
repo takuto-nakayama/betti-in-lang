@@ -1,5 +1,9 @@
-notebook.ipynb
+# directory
 __pycache__/
+results/
+
+# file
+notebook.ipynb
 .env
 *.pyc
 *.pyo
