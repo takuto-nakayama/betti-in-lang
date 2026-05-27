@@ -1,3 +1,4 @@
+from collections import Counter
 from datetime import datetime
 from itertools import combinations
 from flint import fmpz_mat
@@ -11,23 +12,30 @@ class Text:
 		self.lang = lang
 		with open(self.path, mode='r', encoding='utf-8') as f:
 			self.text	= f.readlines()
-			self.parser	= stanza.Pipeline(self.lang, processors='tokenize,pos', tokenize_no_ssplit=True)
+			self.parser	= stanza.Pipeline(
+				self.lang,
+				processors='tokenize,pos',
+				tokenize_no_ssplit=True,
+				use_gpu=True
+				)
 
 
 	def window_for_word(self, k:int=5):
-		window = []		
-		for snt in self.text:
-			parsed	= self.parser(snt)
+		window	= []
+		docs	= [stanza.Document([], text=snt) for snt in self.text]
+		parsed_docs = self.parser(docs)
+		for parsed in parsed_docs:
 			words	= parsed.sentences[0].words
 			for i in range(len(words)-k+1):
 				window.append(
 					[w.text for w in words[i:i+k]]
 				)
 		window = [tuple(w) for w in window]
+		window_counter = Counter(window)
 		
 		self.window = {
-			'item':sorted(set(window)),
-			'frequency':[window.count(i) for i in sorted(set(window))]}
+			'item':sorted(window_counter),
+			'frequency':[window_counter[w] for w in sorted(window_counter)]}
 		
 		print(textwrap.dedent(f'''
 				{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} window for word is done.
@@ -48,10 +56,11 @@ class Text:
 		for snt in self.text:
 			for i in range(len(snt)-k+1):
 				window.append(tuple(snt[i:i+k]))		
+		window_counter = Counter(window)
 		
 		self.window = {
-			'item':sorted(set(window)),
-			'frequency':[window.count(i) for i in sorted(set(window))]}
+			'item':sorted(window_counter),
+			'frequency':[window_counter[w] for w in sorted(window_counter)]}
 		
 		print(textwrap.dedent(f'''
 				{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} window for character is done.
@@ -68,8 +77,9 @@ class Text:
 
 	def window_for_upos(self, k:int=5):
 		window = []		
-		for snt in self.text:
-			parsed	= self.parser(snt)
+		docs	= [stanza.Document([], text=snt) for snt in self.text]
+		parsed_docs = self.parser(docs)
+		for parsed in parsed_docs:
 			words	= parsed.sentences[0].words
 			for i in range(len(words)-k+1):
 				window.append(
@@ -77,10 +87,11 @@ class Text:
 				)
 
 		window = [tuple(w) for w in window]
+		window_counter = Counter(window)
 		
 		self.window = {
-			'item':sorted(set(window)),
-			'frequency':[window.count(i) for i in sorted(set(window))]}
+			'item':sorted(window_counter),
+			'frequency':[window_counter[w] for w in sorted(window_counter)]}
 
 		print(textwrap.dedent(f'''
 				{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} window for UPOS is done.
@@ -97,8 +108,9 @@ class Text:
 
 	def window_for_xpos(self, k:int=5):
 		window = []		
-		for snt in self.text:
-			parsed	= self.parser(snt)
+		docs	= [stanza.Document([], text=snt) for snt in self.text]
+		parsed_docs = self.parser(docs)
+		for parsed in parsed_docs:
 			words	= parsed.sentences[0].words
 			for i in range(len(words)-k+1):
 				window.append(
@@ -106,10 +118,11 @@ class Text:
 				)
 
 		window = [tuple(w) for w in window]
+		window_counter = Counter(window)
 		
 		self.window = {
-			'item':sorted(set(window)),
-			'frequency':[window.count(i) for i in sorted(set(window))]}
+			'item':sorted(window_counter),
+			'frequency':[window_counter[w] for w in sorted(window_counter)]}
 
 		print(textwrap.dedent(f'''
 				{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} window for XPOS is done.
@@ -141,8 +154,9 @@ class WordManifold:
 			for win in self.window:
 				for i in range(self.k-n_i+1):
 					ngram_i.append(win[i:i+n_i])
-			ngram.append(sorted(set(ngram_i)))
-			frequency.append([ngram_i.count(j) for j in sorted(set(ngram_i))])
+			ngram_i_counter = Counter(ngram_i)
+			ngram.append(sorted(ngram_i_counter))
+			frequency.append([ngram_i_counter[j] for j in sorted(ngram_i_counter)])
 		
 		self.ngram = {
 			'item':ngram,
