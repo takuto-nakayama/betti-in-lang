@@ -154,7 +154,7 @@ class WordManifold:
 						
 			{'='*29}
 			|{str('n').center(5)}|{str('type').center(10)}|{str('total').center(10)}|
-			|{str('-').center(5)}|{str('-').center(10)}|{str('-').center(10)}|'''))
+			|{'-'*5}|{'-'*10}|{'-'*10}|'''))
 		for n, ng in enumerate(self.ngram['item']):
 			print(f'|{str(n+1).center(5)}|{str(len(ng)).center(10)}|{str(sum(self.ngram['frequency'][n])).center(10)}|')
 		print(f'{'='*29}')
@@ -199,7 +199,7 @@ class WordManifold:
 
 			{'='*29}
 			|{str('n').center(5)}|{str('type').center(10)}|{str('total').center(10)}|
-			|{str('-').center(5)}|{str('-').center(10)}|{str('-').center(10)}|'''))
+			|{'-'*5}|{'-'*10}|{'-'*10}|'''))
 		for n, s_n in enumerate(self.skeleton['item']):
 			print(f'|{str(n+1).center(5)}|{str(len(s_n)).center(10)}|{str(sum(self.skeleton['frequency'][n])).center(10)}|')
 		print(f'{'='*29}')
@@ -239,7 +239,7 @@ class WordManifold:
 			{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} betti number is done.
 			==================
 			|{str('n').center(5)}|{str('betti').center(10)}|
-			------|-----------'''))
+			|{'-'*5}|{'-'*10}|'''))
 		for n, b in enumerate(self.betti):
 			print(f'|{str(n+1).center(5)}|{str(b).center(10)}|')
 		print('==================')
