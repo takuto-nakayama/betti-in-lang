@@ -41,15 +41,15 @@ if __name__ == '__main__':
 	elif mode	== 'xpos':
 		text.window_for_xpos(k=k)	
 	##	builds a word manifold to obtain the betti numbers for each dimension
-	wm_words	= WordManifold(window=text.window['item'], n=n)
-	wm_words.get_ngram()
-	wm_words.get_skeleton()
-	wm_words.get_boundary()
-	wm_words.get_betti()
+	wm	= WordManifold(window=text.window['item'], n=n)
+	wm.get_ngram()
+	wm.get_skeleton()
+	wm.get_boundary()
+	wm.get_betti()
 
 
 	#	result
 	##	writes the results to the .csv file
 	with open(f'{save_dir}/{save_file_name}.csv', 'a', newline='') as f:
 		writer	= csv.writer(f)
-		writer.writerow([lang]+wm_words.betti)
+		writer.writerow([lang]+wm.betti)

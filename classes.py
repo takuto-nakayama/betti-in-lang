@@ -185,25 +185,18 @@ class WordManifold:
 				}
 
 			for n_i in range(2,self.n):
-				skeleton_i	= []
-				frequency	= []
-				not_found	= False
+				skeleton_i		= []
+				frequency		= []
+				lower_skeleton	= set(self.skeleton['item'][n_i-1])
 
 				for idx, ngram in enumerate(self.ngram['item'][n_i]):
-					combo	= list(combinations(ngram, n_i))
-					p, q = 0, 1
-					for r, c in enumerate(combo):
-						if p == r:
-							p 	+= math.comb(self.k-q, n_i-1)
-							q	+= 1
-						else:
-							if c not in self.ngram['item'][n_i-1]:
-								not_found = True
-								break
-					if not_found:
-						break
-					skeleton_i.append(ngram)
-					frequency.append(self.ngram['frequency'][n_i][idx])
+					all_faces_exist = all(
+						ngram[:k] + ngram[k+1:] in lower_skeleton
+						for k in range(len(ngram))
+					)
+					if all_faces_exist:
+						skeleton_i.append(ngram)
+						frequency.append(self.ngram['frequency'][n_i][idx])
 				
 				self.skeleton['item'].append(skeleton_i)
 				self.skeleton['frequency'].append(frequency)
@@ -223,7 +216,8 @@ class WordManifold:
 	def get_boundary(self):
 		self.boundary = []
 		for n_i in range(self.n-1):
-			skeleton_n, skeleton_n1 = self.skeleton['item'][n_i], self.skeleton['item'][n_i+1]
+			skeleton_n	= self.skeleton['item'][n_i]
+			skeleton_n1 = self.skeleton['item'][n_i+1]
 			b = np.zeros((len(skeleton_n), len(skeleton_n1)), dtype=int)
 
 			for i, s_n in enumerate(skeleton_n):
