@@ -20,7 +20,7 @@ class Text:
 				)
 
 
-	def window_for_word(self, k:int=5):
+	def window_for_word(self, k:int=7):
 		window	= []
 		docs	= [stanza.Document([], text=snt) for snt in self.text]
 		parsed_docs = self.parser(docs)
@@ -50,7 +50,7 @@ class Text:
 			'''))
 
 
-	def window_for_chr(self, k:int=5):
+	def window_for_chr(self, k:int=7):
 		window = []
 
 		for snt in self.text:
@@ -75,7 +75,7 @@ class Text:
 			'''))
 
 
-	def window_for_upos(self, k:int=5):
+	def window_for_upos(self, k:int=7):
 		window = []		
 		docs	= [stanza.Document([], text=snt) for snt in self.text]
 		parsed_docs = self.parser(docs)
@@ -106,7 +106,7 @@ class Text:
 			'''))
 
 
-	def window_for_xpos(self, k:int=5):
+	def window_for_xpos(self, k:int=7):
 		window = []		
 		docs	= [stanza.Document([], text=snt) for snt in self.text]
 		parsed_docs = self.parser(docs)
