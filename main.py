@@ -6,7 +6,7 @@ import argparse, csv, os
 
 if __name__ == '__main__':
 	#	preproceses
-	##	difines the environment variables
+	##	defines the environment variables
 	load_dotenv()
 	local_data	= os.environ['LOCAL_DATA']
 	save_dir	= os.environ['SAVE_DIR']
@@ -17,8 +17,8 @@ if __name__ == '__main__':
 	parser.add_argument('lang', type=str, help='language code (for stanza)')
 	parser.add_argument('save_file_name', type=str, help='output ".csv" file name (the directory must be set in ".env").')
 	parser.add_argument('-mode', type=str, default='word', help='unit in consideration: "word", "chr", "upos", "xpos"')
-	parser.add_argument('-k', type=int, default=5, help='window size')
-	parser.add_argument('-n', type=int, default=5, help='n-gram size (must be smaller than or equal to the window size).')
+	parser.add_argument('-k', type=int, default=7, help='window size')
+	parser.add_argument('-n', type=int, default=7, help='n-gram size (must be smaller than or equal to the window size).')
 
 	args = parser.parse_args()
 	data_file_name	= args.data_file_name
