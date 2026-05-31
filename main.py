@@ -17,15 +17,13 @@ if __name__ == '__main__':
 	parser.add_argument('lang', type=str, help='language code (for stanza)')
 	parser.add_argument('save_file_name', type=str, help='output ".csv" file name (the directory must be set in ".env").')
 	parser.add_argument('-mode', type=str, default='word', help='unit in consideration: "word", "chr", "upos", "xpos"')
-	parser.add_argument('-k', type=int, default=7, help='window size')
-	parser.add_argument('-n', type=int, default=7, help='n-gram size (must be smaller than or equal to the window size).')
+	parser.add_argument('-n', type=int, default=7, help='max n-gram size.')
 
 	args = parser.parse_args()
 	data_file_name	= args.data_file_name
 	lang			= args.lang
 	save_file_name	= args.save_file_name
 	mode			= args.mode
-	k				= args.k
 	n				= args.n
 
 
@@ -33,15 +31,15 @@ if __name__ == '__main__':
 	##	processes the text
 	text		= Text(path=f'{local_data}/{data_file_name}.txt', lang=lang)
 	if mode		== 'word':
-		text.window_for_word(k=k)
+		text.window_for_word(n=n)
 	elif mode	== 'chr':
-		text.window_for_chr(k=k)
+		text.window_for_chr(n=n)
 	elif mode	== 'upos':
-		text.window_for_upos(k=k)
+		text.window_for_upos(n=n)
 	elif mode	== 'xpos':
-		text.window_for_xpos(k=k)	
+		text.window_for_xpos(n=n)	
 	##	builds a word manifold to obtain the betti numbers for each dimension
-	wm	= WordManifold(window=text.window['item'], n=n)
+	wm	= WordManifold(window=text.window['item'])
 	wm.get_ngram()
 	wm.get_skeleton()
 	wm.get_boundary()

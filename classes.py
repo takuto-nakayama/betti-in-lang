@@ -20,15 +20,15 @@ class Text:
 				)
 
 
-	def window_for_word(self, k:int=7):
+	def window_for_word(self, n:int=7):
 		window	= []
 		docs	= [stanza.Document([], text=snt) for snt in self.text]
 		parsed_docs = self.parser(docs)
 		for parsed in parsed_docs:
 			words	= parsed.sentences[0].words
-			for i in range(len(words)-k+1):
+			for i in range(len(words)-n+1):
 				window.append(
-					[w.text for w in words[i:i+k]]
+					[w.text for w in words[i:i+n]]
 				)
 		window = [tuple(w) for w in window]
 		window_counter = Counter(window)
@@ -43,19 +43,19 @@ class Text:
 				{'-'*60}
 				text source:		{self.path}
 				language:		{self.lang}
-				window size:		{k}
+				window size:		{n}
 				types of windows	{len(self.window['item'])}
 				total windows		{sum(self.window['frequency'])}
 				{'-'*60}\n
 			'''))
 
 
-	def window_for_chr(self, k:int=7):
+	def window_for_chr(self, n:int=7):
 		window = []
 
 		for snt in self.text:
-			for i in range(len(snt)-k+1):
-				window.append(tuple(snt[i:i+k]))		
+			for i in range(len(snt)-n+1):
+				window.append(tuple(snt[i:i+n]))		
 		window_counter = Counter(window)
 		
 		self.window = {
@@ -68,22 +68,22 @@ class Text:
 				{'-'*60}
 				text source:		{self.path}
 				language:		{self.lang}
-				window size:		{k}
+				window size:		{n}
 				types of windows	{len(self.window['item'])}
 				total windows		{sum(self.window['frequency'])}
 				{'-'*60}\n
 			'''))
 
 
-	def window_for_upos(self, k:int=7):
+	def window_for_upos(self, n:int=7):
 		window = []		
 		docs	= [stanza.Document([], text=snt) for snt in self.text]
 		parsed_docs = self.parser(docs)
 		for parsed in parsed_docs:
 			words	= parsed.sentences[0].words
-			for i in range(len(words)-k+1):
+			for i in range(len(words)-n+1):
 				window.append(
-					[w.upos for w in words[i:i+k]]
+					[w.upos for w in words[i:i+n]]
 				)
 
 		window = [tuple(w) for w in window]
@@ -99,22 +99,22 @@ class Text:
 				{'-'*60}
 				text source:		{self.path}
 				language:		{self.lang}
-				window size:		{k}
+				window size:		{n}
 				types of windows	{len(self.window['item'])}
 				total windows		{sum(self.window['frequency'])}
 				{'-'*60}\n
 			'''))
 
 
-	def window_for_xpos(self, k:int=7):
+	def window_for_xpos(self, n:int=7):
 		window = []		
 		docs	= [stanza.Document([], text=snt) for snt in self.text]
 		parsed_docs = self.parser(docs)
 		for parsed in parsed_docs:
 			words	= parsed.sentences[0].words
-			for i in range(len(words)-k+1):
+			for i in range(len(words)-n+1):
 				window.append(
-					[w.xpos for w in words[i:i+k]]
+					[w.xpos for w in words[i:i+n]]
 				)
 
 		window = [tuple(w) for w in window]
@@ -130,7 +130,7 @@ class Text:
 				{'-'*60}
 				text source:		{self.path}
 				language:		{self.lang}
-				window size:		{k}
+				window size:		{n}
 				types of windows	{len(self.window['item'])}
 				total windows		{sum(self.window['frequency'])}
 				{'-'*60}\n
@@ -139,10 +139,9 @@ class Text:
 
 
 class WordManifold:
-	def __init__(self, window:list, n:int):
+	def __init__(self, window:list):
 		self.window	= window
-		self.k			= len(window[0])
-		self.n			= n
+		self.n			= len(window[0])
 
 
 	def get_ngram(self):
@@ -152,7 +151,7 @@ class WordManifold:
 		for n_i in range(1,self.n+1):
 			ngram_i = []
 			for win in self.window:
-				for i in range(self.k-n_i+1):
+				for i in range(self.n-n_i+1):
 					ngram_i.append(win[i:i+n_i])
 			ngram_i_counter = Counter(ngram_i)
 			ngram.append(sorted(ngram_i_counter))
