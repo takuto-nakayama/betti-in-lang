@@ -1,9 +1,31 @@
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from itertools import combinations
 from flint import fmpz_mat
+from multiprocessing import Pool
 import numpy as np
 import itertools, math, stanza, textwrap
+
+
+def _boundary_worker(args):
+	skeleton_n, skeleton_n1, n_i = args
+	row_index  = {s: i for i, s in enumerate(skeleton_n)}
+	n_rows     = len(skeleton_n)
+	n_cols     = len(skeleton_n1)
+	simplex_len = n_i + 2
+
+	entries = {}
+	for k in range(simplex_len):
+		sign = 1 if k % 2 == 0 else -1
+		for j, s_n1 in enumerate(skeleton_n1):
+			face = s_n1[:k] + s_n1[k+1:]
+			i = row_index.get(face)
+			if i is not None:
+				entries[(i, j)] = entries.get((i, j), 0) + sign
+
+	coo = [(i, j, v) for (i, j), v in entries.items() if v != 0]
+	return coo, n_rows, n_cols
 
 
 class Text:
@@ -209,47 +231,60 @@ class WordManifold:
 
 
 	def get_boundary(self):
+		# [parallel] each boundary matrix is built independently across processes
+		args = [(self.skeleton['item'][n_i], self.skeleton['item'][n_i+1], n_i)
+				for n_i in range(self.n-1)]
+		with Pool() as pool:
+			results = pool.map(_boundary_worker, args)
+
 		self.boundary = []
-		for n_i in range(self.n-1):
-			skeleton_n	= self.skeleton['item'][n_i]
-			skeleton_n1 = self.skeleton['item'][n_i+1]
-
-			row_index = {s: i for i, s in enumerate(skeleton_n)}
-
-			n_rows = len(skeleton_n)
-			n_cols = len(skeleton_n1)
-			simplex_len = n_i + 2
-
+		for coo, n_rows, n_cols in results:
 			b = [[0] * n_cols for _ in range(n_rows)]
-
-			for k in range(simplex_len):
-				sign = 1 if k % 2 == 0 else -1
-				for j, s_n1 in enumerate(skeleton_n1):
-					face = s_n1[:k] + s_n1[k+1:]
-					i = row_index.get(face)
-					if i is not None:
-						b[i][j] += sign
-
+			for i, j, v in coo:
+				b[i][j] = v
 			self.boundary.append(fmpz_mat(b))
 
-			# [original] O(|S_n| × |S_n1| × n) の三重ループ実装
-			# b = np.zeros((len(skeleton_n), len(skeleton_n1)), dtype=int)
-			# for i, s_n in enumerate(skeleton_n):
-			# 	for j, s_n1 in enumerate(skeleton_n1):
-			# 		for k, _ in enumerate(s_n1):
-			# 			if s_n == s_n1[:k]+s_n1[k+1:]:
-			# 				b[i,j] += int((-1)**k)
-			# b = fmpz_mat(b.tolist())
-			# self.boundary.append(b)
+		# [original] sequential implementation
+		# self.boundary = []
+		# for n_i in range(self.n-1):
+		# 	skeleton_n	= self.skeleton['item'][n_i]
+		# 	skeleton_n1 = self.skeleton['item'][n_i+1]
+		# 	row_index = {s: i for i, s in enumerate(skeleton_n)}
+		# 	n_rows = len(skeleton_n)
+		# 	n_cols = len(skeleton_n1)
+		# 	simplex_len = n_i + 2
+		# 	b = [[0] * n_cols for _ in range(n_rows)]
+		# 	for k in range(simplex_len):
+		# 		sign = 1 if k % 2 == 0 else -1
+		# 		for j, s_n1 in enumerate(skeleton_n1):
+		# 			face = s_n1[:k] + s_n1[k+1:]
+		# 			i = row_index.get(face)
+		# 			if i is not None:
+		# 				b[i][j] += sign
+		# 	self.boundary.append(fmpz_mat(b))
+		# 	# [original] O(|S_n| × |S_n1| × n) の三重ループ実装
+		# 	# b = np.zeros((len(skeleton_n), len(skeleton_n1)), dtype=int)
+		# 	# for i, s_n in enumerate(skeleton_n):
+		# 	# 	for j, s_n1 in enumerate(skeleton_n1):
+		# 	# 		for k, _ in enumerate(s_n1):
+		# 	# 			if s_n == s_n1[:k]+s_n1[k+1:]:
+		# 	# 				b[i,j] += int((-1)**k)
+		# 	# b = fmpz_mat(b.tolist())
+		# 	# self.boundary.append(b)
 
 		print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} boundary is done.\n')
 
 
 	def get_betti(self):
-		ranks = []
-		for n_i, b in enumerate(self.boundary):
-			print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} computing rank of boundary[{n_i}] ({b.nrows()}x{b.ncols()})...', flush=True)
-			ranks.append(b.rank())
+		# [parallel] FLINT's rank() releases the GIL, so threads run truly in parallel
+		with ThreadPoolExecutor() as executor:
+			ranks = list(executor.map(lambda b: b.rank(), self.boundary))
+
+		# [original] sequential rank computation
+		# ranks = []
+		# for n_i, b in enumerate(self.boundary):
+		# 	print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} computing rank of boundary[{n_i}] ({b.nrows()}x{b.ncols()})...', flush=True)
+		# 	ranks.append(b.rank())
 
 		self.betti = []
 		for n_i in range(self.n-2):
