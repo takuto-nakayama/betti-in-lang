@@ -246,18 +246,15 @@ class WordManifold:
 
 
 	def get_betti(self):
+		ranks = []
+		for n_i, b in enumerate(self.boundary):
+			print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} computing rank of boundary[{n_i}] ({b.nrows()}x{b.ncols()})...', flush=True)
+			ranks.append(b.rank())
+
 		self.betti = []
 		for n_i in range(self.n-2):
-			b_n		= self.boundary[n_i]
-			b_n1	= self.boundary[n_i+1]
-
-			m = b_n.ncols()
-			print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} computing rank of boundary[{n_i+1}] ({b_n1.nrows()}x{b_n1.ncols()})...', flush=True)
-			r = b_n1.rank()
-			print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} computing rank of boundary[{n_i}] ({b_n.nrows()}x{b_n.ncols()})...', flush=True)
-			s = b_n.rank()
-
-			self.betti.append(m - r - s)
+			m = self.boundary[n_i].ncols()
+			self.betti.append(m - ranks[n_i+1] - ranks[n_i])
 		
 		print(textwrap.dedent(f'''
 			{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} betti number is done.
