@@ -27,16 +27,15 @@ class Text:
 		for parsed in parsed_docs:
 			words	= parsed.sentences[0].words
 			for i in range(len(words)-n+1):
-				window.append(
-					[w.text for w in words[i:i+n]]
-				)
-		window = [tuple(w) for w in window]
+				window.append(tuple(w.text for w in words[i:i+n]))
+
 		window_counter = Counter(window)
-		
+		items = sorted(window_counter)
+
 		self.window = {
-			'item':sorted(window_counter),
-			'frequency':[window_counter[w] for w in sorted(window_counter)]}
-		
+			'item':items,
+			'frequency':[window_counter[w] for w in items]}
+
 		print(textwrap.dedent(f'''
 				{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} window for word is done.
 				
@@ -55,13 +54,14 @@ class Text:
 
 		for snt in self.text:
 			for i in range(len(snt)-n+1):
-				window.append(tuple(snt[i:i+n]))		
+				window.append(tuple(snt[i:i+n]))
+
 		window_counter = Counter(window)
-		
+		items = sorted(window_counter)
 		self.window = {
-			'item':sorted(window_counter),
-			'frequency':[window_counter[w] for w in sorted(window_counter)]}
-		
+			'item':items,
+			'frequency':[window_counter[w] for w in items]}
+
 		print(textwrap.dedent(f'''
 				{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} window for character is done.
 				
@@ -76,22 +76,20 @@ class Text:
 
 
 	def window_for_upos(self, n:int=7):
-		window = []		
+		window = []
 		docs	= [stanza.Document([], text=snt) for snt in self.text]
 		parsed_docs = self.parser(docs)
 		for parsed in parsed_docs:
 			words	= parsed.sentences[0].words
 			for i in range(len(words)-n+1):
-				window.append(
-					[w.upos for w in words[i:i+n]]
-				)
+				window.append(tuple(w.upos for w in words[i:i+n]))
 
-		window = [tuple(w) for w in window]
 		window_counter = Counter(window)
-		
+		items = sorted(window_counter)
+
 		self.window = {
-			'item':sorted(window_counter),
-			'frequency':[window_counter[w] for w in sorted(window_counter)]}
+			'item':items,
+			'frequency':[window_counter[w] for w in items]}
 
 		print(textwrap.dedent(f'''
 				{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} window for UPOS is done.
@@ -107,22 +105,20 @@ class Text:
 
 
 	def window_for_xpos(self, n:int=7):
-		window = []		
+		window = []
 		docs	= [stanza.Document([], text=snt) for snt in self.text]
 		parsed_docs = self.parser(docs)
 		for parsed in parsed_docs:
 			words	= parsed.sentences[0].words
 			for i in range(len(words)-n+1):
-				window.append(
-					[w.xpos for w in words[i:i+n]]
-				)
+				window.append(tuple(w.xpos for w in words[i:i+n]))
 
-		window = [tuple(w) for w in window]
 		window_counter = Counter(window)
-		
+		items = sorted(window_counter)
+
 		self.window = {
-			'item':sorted(window_counter),
-			'frequency':[window_counter[w] for w in sorted(window_counter)]}
+			'item':items,
+			'frequency':[window_counter[w] for w in items]}
 
 		print(textwrap.dedent(f'''
 				{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} window for XPOS is done.
@@ -217,16 +213,35 @@ class WordManifold:
 		for n_i in range(self.n-1):
 			skeleton_n	= self.skeleton['item'][n_i]
 			skeleton_n1 = self.skeleton['item'][n_i+1]
-			b = np.zeros((len(skeleton_n), len(skeleton_n1)), dtype=int)
 
-			for i, s_n in enumerate(skeleton_n):
+			row_index = {s: i for i, s in enumerate(skeleton_n)}
+
+			n_rows = len(skeleton_n)
+			n_cols = len(skeleton_n1)
+			simplex_len = n_i + 2
+
+			b = [[0] * n_cols for _ in range(n_rows)]
+
+			for k in range(simplex_len):
+				sign = 1 if k % 2 == 0 else -1
 				for j, s_n1 in enumerate(skeleton_n1):
-					for k, _ in enumerate(s_n1):
-						if s_n == s_n1[:k]+s_n1[k+1:]:
-							b[i,j] += int((-1)**k)
-			b = fmpz_mat(b.tolist())
-			self.boundary.append(b)
-		
+					face = s_n1[:k] + s_n1[k+1:]
+					i = row_index.get(face)
+					if i is not None:
+						b[i][j] += sign
+
+			self.boundary.append(fmpz_mat(b))
+
+			# [original] O(|S_n| × |S_n1| × n) の三重ループ実装
+			# b = np.zeros((len(skeleton_n), len(skeleton_n1)), dtype=int)
+			# for i, s_n in enumerate(skeleton_n):
+			# 	for j, s_n1 in enumerate(skeleton_n1):
+			# 		for k, _ in enumerate(s_n1):
+			# 			if s_n == s_n1[:k]+s_n1[k+1:]:
+			# 				b[i,j] += int((-1)**k)
+			# b = fmpz_mat(b.tolist())
+			# self.boundary.append(b)
+
 		print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} boundary is done.\n')
 
 
