@@ -51,3 +51,7 @@ if __name__ == '__main__':
 	with open(f'{save_dir}/{save_file_name}.csv', 'a', newline='') as f:
 		writer	= csv.writer(f)
 		writer.writerow([lang]+wm.betti)
+
+	with open(f'{save_dir}/{save_file_name}-norm.csv', 'a', newline='') as f:
+		writer	= csv.writer(f)
+		writer.writerow([lang]+wm.betti_norm)

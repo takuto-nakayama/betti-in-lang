@@ -169,7 +169,7 @@ class WordManifold:
 			|{str('n').center(5)}|{str('type').center(10)}|{str('total').center(10)}|
 			|{'-'*5}|{'-'*10}|{'-'*10}|'''))
 		for n, ng in enumerate(self.ngram['item']):
-			print(f'|{str(n+1).center(5)}|{str(len(ng)).center(10)}|{str(sum(self.ngram['frequency'][n])).center(10)}|')
+			print(f'|{str(n).center(5)}|{str(len(ng)).center(10)}|{str(sum(self.ngram['frequency'][n])).center(10)}|')
 		print(f'{'='*29}')
 
 
@@ -207,7 +207,7 @@ class WordManifold:
 			|{str('n').center(5)}|{str('type').center(10)}|{str('total').center(10)}|
 			|{'-'*5}|{'-'*10}|{'-'*10}|'''))
 		for n, s_n in enumerate(self.skeleton['item']):
-			print(f'|{str(n+1).center(5)}|{str(len(s_n)).center(10)}|{str(sum(self.skeleton['frequency'][n])).center(10)}|')
+			print(f'|{str(n).center(5)}|{str(len(s_n)).center(10)}|{str(sum(self.skeleton['frequency'][n])).center(10)}|')
 		print(f'{'='*29}')
 
 
@@ -246,21 +246,23 @@ class WordManifold:
 
 	def get_betti(self):
 		self.betti = []
+		self.betti_norm = []
+		rank = []
+		for n, B_n in enumerate(self.boundary):
+			r = B_n.rank()
+			rank.append(r)
+			print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} rank of boundary_{n}: {r}', flush=True)
+
 		for n_i in range(self.n-2):
-			b_n		= self.boundary[n_i]
-			b_n1	= self.boundary[n_i+1]
+			m = len(self.skeleton['item'][n_i+1])
+			self.betti.append(m - rank[n_i] - rank[n_i+1])
+			self.betti_norm.append(self.betti[n_i] / m)
 
-			m = b_n.ncols()
-			r = b_n1.rank()
-			s = b_n.rank()
-
-			self.betti.append(m - r - s)
-		
 		print(textwrap.dedent(f'''
 			{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} betti number is done.
-			==================
-			|{str('n').center(5)}|{str('betti').center(10)}|
-			|{'-'*5}|{'-'*10}|'''))
+			==================================
+			|{str('n').center(5)}|{str('betti').center(10)}|{str('normalized').center(15)}|
+			|{'-'*5}|{'-'*10}|{'-'*15}|'''))
 		for n, b in enumerate(self.betti):
-			print(f'|{str(n+1).center(5)}|{str(b).center(10)}|')
-		print('==================')
+			print(f'|{str(n).center(5)}|{str(b).center(10)}|{str(self.betti_norm[n]).center(15)}|')
+		print('==================================')
