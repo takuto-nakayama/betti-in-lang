@@ -2,7 +2,7 @@ from collections import Counter
 # from concurrent.futures import as_completed, ThreadPoolExecutor  # used by fmpz_mat rank (commented out)
 from datetime import datetime
 from itertools import combinations
-from flint import fmpz_mat
+# from flint import fmpz_mat  # used by original fmpz_mat boundary construction (commented out)
 # from multiprocessing import Pool  # used by parallel get_boundary() (commented out)
 import numpy as np
 import itertools, math, stanza, textwrap
