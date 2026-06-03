@@ -256,7 +256,10 @@ class WordManifold:
 		for n_i in range(self.n-2):
 			m = len(self.skeleton['item'][n_i+1])
 			self.betti.append(m - rank[n_i] - rank[n_i+1])
-			self.betti_norm.append(self.betti[n_i] / m)
+			if m > 0:
+				self.betti_norm.append(self.betti[n_i] / m)
+			else:
+				self.betti_norm.append(0)
 
 		print(textwrap.dedent(f'''
 			{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} betti number is done.
