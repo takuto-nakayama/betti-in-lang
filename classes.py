@@ -252,7 +252,6 @@ class WordManifold:
 
 
 	def get_boundary(self):
-		self.boundary     = []
 		self._boundary_coo = []
 		for n_i in range(self.n-1):
 			skeleton_n	= self.skeleton['item'][n_i]
@@ -273,10 +272,13 @@ class WordManifold:
 						entries[key] = entries.get(key, 0) + sign
 			coo = [(i, j, v) for (i, j), v in entries.items() if v != 0]
 			self._boundary_coo.append((coo, n_rows, n_cols))
-			mat = fmpz_mat(n_rows, n_cols)
-			for i, j, v in coo:
-				mat[i, j] = v
-			self.boundary.append(mat)
+
+			# [original] fmpz_mat construction — causes OOM for large matrices (e.g. word mode)
+			# self.boundary = []
+			# mat = fmpz_mat(n_rows, n_cols)
+			# for i, j, v in coo:
+			# 	mat[i, j] = v
+			# self.boundary.append(mat)
 
 			# [original] dense list construction + fmpz_mat
 			# b = [[0] * n_cols for _ in range(n_rows)]
