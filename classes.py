@@ -1,30 +1,8 @@
 from collections import Counter
-# from concurrent.futures import as_completed, ThreadPoolExecutor  # used by fmpz_mat rank (commented out)
 from datetime import datetime
 from itertools import combinations
-# from flint import fmpz_mat  # used by original fmpz_mat boundary construction (commented out)
-# from multiprocessing import Pool  # used by parallel get_boundary() (commented out)
 import numpy as np
 import itertools, math, stanza, textwrap
-
-
-# [parallel] worker for get_boundary() — disabled due to Pool hang on macOS (spawn mode)
-# def _boundary_worker(args):
-# 	skeleton_n, skeleton_n1, n_i = args
-# 	row_index  = {s: i for i, s in enumerate(skeleton_n)}
-# 	n_rows     = len(skeleton_n)
-# 	n_cols     = len(skeleton_n1)
-# 	simplex_len = n_i + 2
-# 	entries = {}
-# 	for k in range(simplex_len):
-# 		sign = 1 if k % 2 == 0 else -1
-# 		for j, s_n1 in enumerate(skeleton_n1):
-# 			face = s_n1[:k] + s_n1[k+1:]
-# 			i = row_index.get(face)
-# 			if i is not None:
-# 				entries[(i, j)] = entries.get((i, j), 0) + sign
-# 	coo = [(i, j, v) for (i, j), v in entries.items() if v != 0]
-# 	return coo, n_rows, n_cols
 
 
 def _rank_mod2(coo, n_rows, n_cols):
@@ -182,7 +160,6 @@ class WordManifold:
 		self.window	= window
 		self.n			= len(window[0])
 
-
 	def get_ngram(self):
 		ngram		= []
 		frequency	= []
@@ -250,7 +227,6 @@ class WordManifold:
 		print(f'{'='*29}')
 
 
-
 	def get_boundary(self):
 		self._boundary_coo = []
 		for n_i in range(self.n-1):
@@ -273,45 +249,6 @@ class WordManifold:
 			coo = [(i, j, v) for (i, j), v in entries.items() if v != 0]
 			self._boundary_coo.append((coo, n_rows, n_cols))
 
-			# [original] fmpz_mat construction — causes OOM for large matrices (e.g. word mode)
-			# self.boundary = []
-			# mat = fmpz_mat(n_rows, n_cols)
-			# for i, j, v in coo:
-			# 	mat[i, j] = v
-			# self.boundary.append(mat)
-
-			# [original] dense list construction + fmpz_mat
-			# b = [[0] * n_cols for _ in range(n_rows)]
-			# for k in range(simplex_len):
-			# 	sign = 1 if k % 2 == 0 else -1
-			# 	for j, s_n1 in enumerate(skeleton_n1):
-			# 		face = s_n1[:k] + s_n1[k+1:]
-			# 		i = row_index.get(face)
-			# 		if i is not None:
-			# 			b[i][j] += sign
-			# self.boundary.append(fmpz_mat(b))
-			# [original] O(|S_n| × |S_n1| × n) の三重ループ実装
-			# b = np.zeros((len(skeleton_n), len(skeleton_n1)), dtype=int)
-			# for i, s_n in enumerate(skeleton_n):
-			# 	for j, s_n1 in enumerate(skeleton_n1):
-			# 		for k, _ in enumerate(s_n1):
-			# 			if s_n == s_n1[:k]+s_n1[k+1:]:
-			# 				b[i,j] += int((-1)**k)
-			# b = fmpz_mat(b.tolist())
-			# self.boundary.append(b)
-
-		# [parallel] macOS の spawn 方式では Pool が hang するため無効化
-		# args = [(self.skeleton['item'][n_i], self.skeleton['item'][n_i+1], n_i)
-		# 		for n_i in range(self.n-1)]
-		# with Pool() as pool:
-		# 	results = pool.map(_boundary_worker, args)
-		# self.boundary = []
-		# for coo, n_rows, n_cols in results:
-		# 	b = [[0] * n_cols for _ in range(n_rows)]
-		# 	for i, j, v in coo:
-		# 		b[i][j] = v
-		# 	self.boundary.append(fmpz_mat(b))
-
 		print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} boundary is done.\n')
 
 
@@ -322,26 +259,21 @@ class WordManifold:
 			print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} rank of boundary[{n_i}] ({n_rows}x{n_cols}) = {r}', flush=True)
 			ranks.append(r)
 
-		# [original] fmpz_mat exact rank over Z (slow for large matrices)
-		# ranks = [None] * len(self.boundary)
-		# with ThreadPoolExecutor() as executor:
-		# 	futures = {executor.submit(b.rank): n_i for n_i, b in enumerate(self.boundary)}
-		# 	for future in as_completed(futures):
-		# 		n_i = futures[future]
-		# 		b = self.boundary[n_i]
-		# 		ranks[n_i] = future.result()
-		# 		print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} rank of boundary[{n_i}] ({b.nrows()}x{b.ncols()}) = {ranks[n_i]}', flush=True)
-
 		self.betti = []
+		self.betti_norm = []
 		for n_i in range(self.n-2):
 			_, _, m = self._boundary_coo[n_i]
 			self.betti.append(m - ranks[n_i+1] - ranks[n_i])
+			if m > 0:
+				self.betti_norm.append(round(self.betti[n_i] / m, 7))
+			else:
+				self.betti_norm.append(0)
 		
 		print(textwrap.dedent(f'''
 			{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} betti number is done.
-			==================
-			|{str('n').center(5)}|{str('betti').center(10)}|
-			|{'-'*5}|{'-'*10}|'''))
+			===============================
+			|{str('n').center(5)}|{str('betti').center(10)}|{str('nominalized').center(12)}
+			|{'-'*5}|{'-'*10}|{'-'*12}|'''))
 		for n, b in enumerate(self.betti):
-			print(f'|{str(n+1).center(5)}|{str(b).center(10)}|')
-		print('==================')
+			print(f'|{str(n).center(5)}|{str(b).center(10)}|{str(self.betti_norm[n]).center(12)}|')
+		print('===============================')
