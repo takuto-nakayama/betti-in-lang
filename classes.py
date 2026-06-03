@@ -217,14 +217,28 @@ class WordManifold:
 		for n_i in range(self.n-1):
 			skeleton_n	= self.skeleton['item'][n_i]
 			skeleton_n1 = self.skeleton['item'][n_i+1]
-			b = np.zeros((len(skeleton_n), len(skeleton_n1)), dtype=int)
+			row_index = {s: i for i, s in enumerate(skeleton_n)}
+        
+			n_rows = len(skeleton_n)
+			n_cols = len(skeleton_n1)
+			
+			b = fmpz_mat(n_rows, n_cols)
+			
+			for j, s_n1 in enumerate(skeleton_n1):
+				for k in range(len(s_n1)):
+					face = s_n1[:k] + s_n1[k+1:]
+					i = row_index.get(face)
+					if i is not None:
+						b[i, j] = b[i, j] + (-1)**k
+			
+#			b = np.zeros((len(skeleton_n), len(skeleton_n1)), dtype=int)
 
-			for i, s_n in enumerate(skeleton_n):
-				for j, s_n1 in enumerate(skeleton_n1):
-					for k, _ in enumerate(s_n1):
-						if s_n == s_n1[:k]+s_n1[k+1:]:
-							b[i,j] += int((-1)**k)
-			b = fmpz_mat(b.tolist())
+#			for i, s_n in enumerate(skeleton_n):
+#				for j, s_n1 in enumerate(skeleton_n1):
+#					for k, _ in enumerate(s_n1):
+#						if s_n == s_n1[:k]+s_n1[k+1:]:
+#							b[i,j] += int((-1)**k)
+#			b = fmpz_mat(b.tolist())
 			self.boundary.append(b)
 		
 		print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} boundary is done.\n')
