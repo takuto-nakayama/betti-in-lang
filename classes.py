@@ -257,15 +257,15 @@ class WordManifold:
 			m = len(self.skeleton['item'][n_i+1])
 			self.betti.append(m - rank[n_i] - rank[n_i+1])
 			if m > 0:
-				self.betti_norm.append(self.betti[n_i] / m)
+				self.betti_norm.append(round(self.betti[n_i] / m, 7))
 			else:
 				self.betti_norm.append(0)
 
 		print(textwrap.dedent(f'''
 			{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} betti number is done.
-			==================================
-			|{str('n').center(5)}|{str('betti').center(10)}|{str('normalized').center(15)}|
-			|{'-'*5}|{'-'*10}|{'-'*15}|'''))
+			===============================
+			|{str('n').center(5)}|{str('betti').center(10)}|{str('normalized').center(12)}|
+			|{'-'*5}|{'-'*10}|{'-'*12}|'''))
 		for n, b in enumerate(self.betti):
-			print(f'|{str(n).center(5)}|{str(b).center(10)}|{str(self.betti_norm[n]).center(15)}|')
-		print('==================================')
+			print(f'|{str(n).center(5)}|{str(b).center(10)}|{str(self.betti_norm[n]).center(12)}|')
+		print('===============================')
