@@ -52,29 +52,28 @@ class Text:
 				)
 			)
 		
-		print(f'''
-				{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into word is done.
-
-				{'='*50}
-				text source:		{self.path}
-				language:		{self.lang}
-				length		{len(self.parsed_sentences)}
-				{'='*50}
-			''')
+		print(textwrap.dedent(f'''
+		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into word is done.
+		{'='*50}
+		text source:		{self.path}
+		language:		{self.lang}
+		length			{len(self.parsed_sentences)}
+		{'='*50}
+		'''))
 
 
 	def parse_to_chr(self):
 		self.parsed_sentences = [tuple(snt for snt in self.text)]
 
-		print(f'''
-				{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into character is done.
+		print(textwrap.dedent(f'''
+		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into character is done.
 
-				{'='*50}
-				text source:		{self.path}
-				language:		{self.lang}
-				length		{len(self.parsed_sentences)}
-				{'='*50}
-			''')
+		{'='*50}
+		text source:		{self.path}
+		language:		{self.lang}
+		length		{len(self.parsed_sentences)}
+		{'='*50}
+		'''))
 
 
 	def parse_to_upos(self):
@@ -88,15 +87,15 @@ class Text:
 				)
 			)
 		
-		print(f'''
-				{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into UPOS tags is done.
+		print(textwrap.dedent(f'''
+		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into UPOS tags is done.
 
-				{'='*50}
-				text source:		{self.path}
-				language:		{self.lang}
-				length		{len(self.parsed_sentences)}
-				{'='*50}
-			''')
+		{'='*50}
+		text source:		{self.path}
+		language:		{self.lang}
+		length		{len(self.parsed_sentences)}
+		{'='*50}
+		'''))
 
 
 
@@ -131,7 +130,7 @@ class WordManifold:
 			|{str('n').center(5)}|{str('type').center(10)}|{str('total').center(10)}|
 			|{'-'*5}|{'-'*10}|{'-'*10}|'''))
 		for n, ng in enumerate(self.ngram['item']):
-			print(f'|{str(n+1).center(5)}|{str(len(ng)).center(10)}|{str(sum(self.ngram['frequency'][n])).center(10)}|')
+			print(f'|{str(n).center(5)}|{str(len(ng)).center(10)}|{str(sum(self.ngram['frequency'][n])).center(10)}|')
 		print(f'{'='*29}')
 
 
@@ -169,7 +168,7 @@ class WordManifold:
 			|{str('n').center(5)}|{str('type').center(10)}|{str('total').center(10)}|
 			|{'-'*5}|{'-'*10}|{'-'*10}|'''))
 		for n, s_n in enumerate(self.skeleton['item']):
-			print(f'|{str(n+1).center(5)}|{str(len(s_n)).center(10)}|{str(sum(self.skeleton['frequency'][n])).center(10)}|')
+			print(f'|{str(n).center(5)}|{str(len(s_n)).center(10)}|{str(sum(self.skeleton['frequency'][n])).center(10)}|')
 		print(f'{'='*29}')
 
 
