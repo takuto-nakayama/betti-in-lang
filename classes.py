@@ -32,7 +32,7 @@ class Text:
 		self.path = path
 		self.lang = lang
 		with open(self.path, mode='r', encoding='utf-8') as f:
-			self.text	= f.readlines()
+			self.text	= [line.strip() for line in f.readlines()]
 			self.parser	= stanza.Pipeline(
 				self.lang,
 				processors='tokenize,pos',
@@ -41,124 +41,70 @@ class Text:
 				)
 
 
-	def window_for_word(self, n:int=7):
-		window	= []
-		docs	= [stanza.Document([], text=snt) for snt in self.text]
+	def parse_to_word(self):
+		self.parsed_sentences = []
+		docs = [stanza.Document([], text=snt) for snt in self.text]
 		parsed_docs = self.parser(docs)
 		for parsed in parsed_docs:
-			words	= parsed.sentences[0].words
-			for i in range(len(words)-n+1):
-				window.append(tuple(w.text for w in words[i:i+n]))
+			self.parsed_sentences.append(
+				tuple(
+					w.text for w in parsed.sentences[0].words
+				)
+			)
+		
+		print(f'''
+				{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into word is done.
 
-		window_counter = Counter(window)
-		items = sorted(window_counter)
-
-		self.window = {
-			'item':items,
-			'frequency':[window_counter[w] for w in items]}
-
-		print(textwrap.dedent(f'''
-				{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} window for word is done.
-				
-				{'-'*60}
+				{'='*50}
 				text source:		{self.path}
 				language:		{self.lang}
-				window size:		{n}
-				types of windows	{len(self.window['item'])}
-				total windows		{sum(self.window['frequency'])}
-				{'-'*60}\n
-			'''))
+				length		{len(self.parsed_sentences)}
+				{'='*50}
+			''')
 
 
-	def window_for_chr(self, n:int=7):
-		window = []
+	def parse_to_chr(self):
+		self.parsed_sentences = [tuple(snt for snt in self.text)]
 
-		for snt in self.text:
-			for i in range(len(snt)-n+1):
-				window.append(tuple(snt[i:i+n]))
+		print(f'''
+				{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into character is done.
 
-		window_counter = Counter(window)
-		items = sorted(window_counter)
-		self.window = {
-			'item':items,
-			'frequency':[window_counter[w] for w in items]}
-
-		print(textwrap.dedent(f'''
-				{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} window for character is done.
-				
-				{'-'*60}
+				{'='*50}
 				text source:		{self.path}
 				language:		{self.lang}
-				window size:		{n}
-				types of windows	{len(self.window['item'])}
-				total windows		{sum(self.window['frequency'])}
-				{'-'*60}\n
-			'''))
+				length		{len(self.parsed_sentences)}
+				{'='*50}
+			''')
 
 
-	def window_for_upos(self, n:int=7):
-		window = []
-		docs	= [stanza.Document([], text=snt) for snt in self.text]
+	def parse_to_upos(self):
+		self.parsed_sentences = []
+		docs = [stanza.Document([], text=snt) for snt in self.text]
 		parsed_docs = self.parser(docs)
 		for parsed in parsed_docs:
-			words	= parsed.sentences[0].words
-			for i in range(len(words)-n+1):
-				window.append(tuple(w.upos for w in words[i:i+n]))
+			self.parsed_sentences.append(
+				tuple(
+					w.upos for w in parsed.sentences[0].words
+				)
+			)
+		
+		print(f'''
+				{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into UPOS tags is done.
 
-		window_counter = Counter(window)
-		items = sorted(window_counter)
-
-		self.window = {
-			'item':items,
-			'frequency':[window_counter[w] for w in items]}
-
-		print(textwrap.dedent(f'''
-				{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} window for UPOS is done.
-				
-				{'-'*60}
+				{'='*50}
 				text source:		{self.path}
 				language:		{self.lang}
-				window size:		{n}
-				types of windows	{len(self.window['item'])}
-				total windows		{sum(self.window['frequency'])}
-				{'-'*60}\n
-			'''))
-
-
-	def window_for_xpos(self, n:int=7):
-		window = []
-		docs	= [stanza.Document([], text=snt) for snt in self.text]
-		parsed_docs = self.parser(docs)
-		for parsed in parsed_docs:
-			words	= parsed.sentences[0].words
-			for i in range(len(words)-n+1):
-				window.append(tuple(w.xpos for w in words[i:i+n]))
-
-		window_counter = Counter(window)
-		items = sorted(window_counter)
-
-		self.window = {
-			'item':items,
-			'frequency':[window_counter[w] for w in items]}
-
-		print(textwrap.dedent(f'''
-				{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} window for XPOS is done.
-				
-				{'-'*60}
-				text source:		{self.path}
-				language:		{self.lang}
-				window size:		{n}
-				types of windows	{len(self.window['item'])}
-				total windows		{sum(self.window['frequency'])}
-				{'-'*60}\n
-			'''))
+				length		{len(self.parsed_sentences)}
+				{'='*50}
+			''')
 
 
 
 class WordManifold:
-	def __init__(self, window:list):
-		self.window	= window
-		self.n			= len(window[0])
+	def __init__(self, parsed_text:list, n:int):
+		self.parsed_text = parsed_text
+		self.n = n
+
 
 	def get_ngram(self):
 		ngram		= []
@@ -166,9 +112,9 @@ class WordManifold:
 
 		for n_i in range(1,self.n+1):
 			ngram_i = []
-			for win in self.window:
+			for snt in self.parsed_text:
 				for i in range(self.n-n_i+1):
-					ngram_i.append(win[i:i+n_i])
+					ngram_i.append(snt[i:i+n_i])
 			ngram_i_counter = Counter(ngram_i)
 			ngram.append(sorted(ngram_i_counter))
 			frequency.append([ngram_i_counter[j] for j in sorted(ngram_i_counter)])

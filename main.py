@@ -31,15 +31,14 @@ if __name__ == '__main__':
 	##	processes the text
 	text		= Text(path=f'{local_data}/{data_file_name}.txt', lang=lang)
 	if mode		== 'word':
-		text.window_for_word(n=n)
+		text.parse_to_word()
 	elif mode	== 'chr':
-		text.window_for_chr(n=n)
+		text.parse_to_chr()
 	elif mode	== 'upos':
-		text.window_for_upos(n=n)
-	elif mode	== 'xpos':
-		text.window_for_xpos(n=n)	
+		text.parse_to_upos()
+
 	##	builds a word manifold to obtain the betti numbers for each dimension
-	wm	= WordManifold(window=text.window['item'])
+	wm	= WordManifold(parsed_text=text.parsed_sentences, n=n)
 	wm.get_ngram()
 	wm.get_skeleton()
 	wm.get_boundary()
