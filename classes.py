@@ -1,6 +1,7 @@
 from collections import Counter
 from datetime import datetime
 from itertools import combinations
+from flint import fmpz_mat
 import numpy as np
 import itertools, math, stanza, textwrap
 
@@ -229,7 +230,7 @@ class WordManifold:
 		for n, B_n in enumerate(self.boundary):
 			r = B_n.rank()
 			rank.append(r)
-			print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} rank of boundary_{n}: {r}', flush=True)
+			print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} rank of boundary_{n+1}: {r}', flush=True)
 
 		for n_i in range(self.n-2):
 			m = len(self.skeleton['item'][n_i+1])
@@ -253,7 +254,7 @@ class WordManifold:
 		ranks = []
 		for n_i, (coo, n_rows, n_cols) in enumerate(self._boundary_coo):
 			r = _rank_mod2(coo, n_rows, n_cols)
-			print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} rank of boundary[{n_i}] ({n_rows}x{n_cols}) = {r}', flush=True)
+			print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} rank of boundary[{n_i+1}] ({n_rows}x{n_cols}) = {r}', flush=True)
 			ranks.append(r)
 
 		self.betti = []
@@ -269,7 +270,7 @@ class WordManifold:
 		print(textwrap.dedent(f'''
 			{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} betti number is done.
 			===============================
-			|{str('n').center(5)}|{str('betti').center(10)}|{str('nominalized').center(12)}
+			|{str('n').center(5)}|{str('betti').center(10)}|{str('nominalized').center(12)}|
 			|{'-'*5}|{'-'*10}|{'-'*12}|'''))
 		for n, b in enumerate(self.betti):
 			print(f'|{str(n).center(5)}|{str(b).center(10)}|{str(self.betti_norm[n]).center(12)}|')
