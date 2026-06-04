@@ -11,6 +11,7 @@ if __name__ == '__main__':
 	local_data	= os.environ['LOCAL_DATA']
 	save_dir	= os.environ['SAVE_DIR']
 
+
 	##	defines the input variables
 	parser		= argparse.ArgumentParser()
 	parser.add_argument('data_file_name', type=str, help='input ".txt" file name (the directory must be set in ".env").')
@@ -18,6 +19,7 @@ if __name__ == '__main__':
 	parser.add_argument('save_file_name', type=str, help='output ".csv" file name (the directory must be set in ".env").')
 	parser.add_argument('-mode', type=str, default='word', help='unit in consideration: "word", "chr", "upos", "xpos"')
 	parser.add_argument('-n', type=int, default=7, help='max n-gram size.')
+	parser.add_argument('-faster', action='store_true', help='If true, the process uses the approximate in getting betti number.')
 
 	args = parser.parse_args()
 	data_file_name	= args.data_file_name
@@ -25,25 +27,29 @@ if __name__ == '__main__':
 	save_file_name	= args.save_file_name
 	mode			= args.mode
 	n				= args.n
+	faster			= args.faster
 
 
 	#	main processes
 	##	processes the text
 	text		= Text(path=f'{local_data}/{data_file_name}.txt', lang=lang)
 	if mode		== 'word':
-		text.window_for_word(n=n)
+		text.parse_to_word()
 	elif mode	== 'chr':
-		text.window_for_chr(n=n)
+		text.parse_to_chr()
 	elif mode	== 'upos':
-		text.window_for_upos(n=n)
-	elif mode	== 'xpos':
-		text.window_for_xpos(n=n)	
+		text.parse_to_upos()
+
 	##	builds a word manifold to obtain the betti numbers for each dimension
 	wm	= WordManifold(window=text.window['item'])
 	wm.get_ngram()
 	wm.get_skeleton()
-	wm.get_boundary()
-	wm.get_betti()
+	if faster:
+		wm.get_boundary_mod2()
+		wm.get_betti_mod2()
+	else:
+		wm.get_boundary()
+		wm.get_betti()
 
 
 	#	result
