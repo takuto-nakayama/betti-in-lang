@@ -41,7 +41,7 @@ if __name__ == '__main__':
 		text.parse_to_upos()
 
 	##	builds a word manifold to obtain the betti numbers for each dimension
-	wm	= WordManifold(window=text.window['item'])
+	wm	= WordManifold(parsed_text=text.parsed_sentences, n=n)
 	wm.get_ngram()
 	wm.get_skeleton()
 	if faster:
