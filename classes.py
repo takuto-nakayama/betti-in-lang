@@ -232,6 +232,10 @@ class WordManifold:
 			rank.append(r)
 			print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} rank of boundary_{n+1}: {r}', flush=True)
 
+		m = len(self.skeleton['item'][0])
+		self.betti.append(m - rank[0])
+		self.betti_norm.append((m - rank[0]) / m)
+
 		for n_i in range(self.n-2):
 			m = len(self.skeleton['item'][n_i+1])
 			self.betti.append(m - rank[n_i] - rank[n_i+1])
@@ -251,17 +255,22 @@ class WordManifold:
 
 
 	def get_betti_mod2(self):
-		ranks = []
+		rank = []
+		self.betti = []
+		self.betti_norm = []
 		for n_i, (coo, n_rows, n_cols) in enumerate(self._boundary_coo):
 			r = _rank_mod2(coo, n_rows, n_cols)
 			print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} rank of boundary[{n_i+1}] ({n_rows}x{n_cols}) = {r}', flush=True)
-			ranks.append(r)
+			rank.append(r)
 
-		self.betti = []
-		self.betti_norm = []
+		_, _, m = self._boundary_coo[0]
+		self.betti.append(m - rank[0])
+		self.betti_norm.append((m - rank[0]) / m)
+
+
 		for n_i in range(self.n-2):
 			_, _, m = self._boundary_coo[n_i]
-			self.betti.append(m - ranks[n_i+1] - ranks[n_i])
+			self.betti.append(m - rank[n_i+1] - rank[n_i])
 			if m > 0:
 				self.betti_norm.append(round(self.betti[n_i] / m, 7))
 			else:
