@@ -66,7 +66,7 @@ class Text:
 
 
 	def parse_to_chr(self):
-		self.parsed_sentences = [tuple(snt for snt in self.text)]
+		self.parsed_sentences =self.text
 
 		print(textwrap.dedent(f'''
 		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into character is done.
@@ -240,7 +240,7 @@ class WordManifold:
 			m = len(self.skeleton['item'][n_i+1])
 			self.betti.append(m - rank[n_i] - rank[n_i+1])
 			if m > 0:
-				self.betti_norm.append(round(self.betti[n_i] / m, 7))
+				self.betti_norm.append(round(self.betti[n_i+1] / m, 7))
 			else:
 				self.betti_norm.append(0)
 
@@ -272,7 +272,7 @@ class WordManifold:
 			_, _, m = self._boundary_coo[n_i]
 			self.betti.append(m - rank[n_i+1] - rank[n_i])
 			if m > 0:
-				self.betti_norm.append(round(self.betti[n_i] / m, 7))
+				self.betti_norm.append(round(self.betti[n_i+1] / m, 7))
 			else:
 				self.betti_norm.append(0)
 		
