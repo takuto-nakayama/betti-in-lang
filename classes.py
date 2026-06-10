@@ -326,7 +326,9 @@ class WordManifold:
 			m = len(self.skeleton['item'][n_i+1])
 			self.betti.append(m - rank[n_i] - rank[n_i+1])
 			if m > 0:
-				self.betti_norm.append(round(self.betti[n_i+1] / m, 7))
+				self.betti_norm.append(
+					round((self.betti[n_i+1] / m), 7)
+					)
 			else:
 				self.betti_norm.append(0)
 
@@ -360,7 +362,9 @@ class WordManifold:
 			_, _, m = self._boundary_coo[n_i]
 			self.betti.append(m - rank[n_i+1] - rank[n_i])
 			if m > 0:
-				self.betti_norm.append(round(self.betti[n_i+1] / m, 7))
+				self.betti_norm.append(
+					round((self.betti[n_i+1] / m), 7)
+					)
 			else:
 				self.betti_norm.append(0)
 		
