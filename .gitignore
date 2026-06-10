@@ -1,6 +1,7 @@
 # directory
 __pycache__/
-results/
+results-bible/
+results-wiki/
 
 # file
 notebook.ipynb

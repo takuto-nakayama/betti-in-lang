@@ -2,8 +2,9 @@ from collections import Counter
 from datetime import datetime
 from itertools import combinations
 from flint import fmpz_mat
+from datasets import load_dataset
 import numpy as np
-import itertools, math, stanza, textwrap
+import itertools, math, random, stanza, textwrap
 
 
 
@@ -95,6 +96,82 @@ class Text:
 		text source:		{self.path}
 		language:		{self.lang}
 		length			{len(self.parsed_sentences)}
+		{'='*50}
+		'''))
+
+
+
+
+class Wiki:
+	def __init__(self, wiki_config:str, lang:str, batch:int):
+		self.wiki_config = wiki_config
+		self.lang = lang
+
+		dataset = load_dataset('wikimedia/wikipedia', wiki_config, streaming=True, split='train')
+		indices = random.sample(range(len(dataset)), k=batch)
+		sampled = dataset.select(indices)
+		self.sentences = []
+
+		for article in sampled:
+			for para in article.split('\n'):
+				if para.strip():
+					self.sentences.append(para.strip())
+
+
+	def parse_to_word(self):
+		self.parsed_sentences = []
+		docs = [stanza.Document([], text=snt) for snt in self.sentences]
+		parsed_docs = self.parser(docs)
+		for parsed in parsed_docs:
+			self.parsed_sentences.append(
+				tuple(
+					w.text for w in parsed.sentences[0].words
+				)
+			)
+		
+		print(textwrap.dedent(f'''
+		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into word is done.
+		{'='*50}
+		text source:		{self.wiki_config}
+		language:		{self.lang}
+		sentences		{len(self.parsed_sentences)}
+		tokens			{len([_ for snt in self.parsed_sentences for _ in snt])}
+		{'='*50}
+		'''))
+
+
+	def parse_to_chr(self):
+		self.parsed_sentences =self.sentences
+
+		print(textwrap.dedent(f'''
+		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into character is done.
+		{'='*50}
+		text source:		{self.wiki_config}
+		language:		{self.lang}
+		sentences			{len(self.parsed_sentences)} sentences.
+		tokens			{len([_ for snt in self.parsed_sentences for _ in snt])}
+		{'='*50}
+		'''))
+
+
+	def parse_to_upos(self):
+		self.parsed_sentences = []
+		docs = [stanza.Document([], text=snt) for snt in self.sentences]
+		parsed_docs = self.parser(docs)
+		for parsed in parsed_docs:
+			self.parsed_sentences.append(
+				tuple(
+					w.upos for w in parsed.sentences[0].words
+				)
+			)
+		
+		print(textwrap.dedent(f'''
+		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into upos is done.
+		{'='*50}
+		text source:		{self.wiki_config}
+		language:		{self.lang}
+		sentences		{len(self.parsed_sentences)}
+		tokens			{len([_ for snt in self.parsed_sentences for _ in snt])}
 		{'='*50}
 		'''))
 
