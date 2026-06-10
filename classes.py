@@ -106,14 +106,21 @@ class Wiki:
 	def __init__(self, wiki_config:str, lang:str, batch:int):
 		self.wiki_config = wiki_config
 		self.lang = lang
+		self.parser	= stanza.Pipeline(
+			self.lang,
+			processors='tokenize,pos',
+			tokenize_no_ssplit=True,
+			use_gpu=True
+			)
 
-		dataset = load_dataset('wikimedia/wikipedia', wiki_config, streaming=True, split='train')
+
+		dataset = load_dataset('wikimedia/wikipedia', wiki_config, split='train')
 		indices = random.sample(range(len(dataset)), k=batch)
 		sampled = dataset.select(indices)
 		self.sentences = []
 
 		for article in sampled:
-			for para in article.split('\n'):
+			for para in article['text'].split('\n'):
 				if para.strip():
 					self.sentences.append(para.strip())
 
@@ -311,7 +318,9 @@ class WordManifold:
 
 		m = len(self.skeleton['item'][0])
 		self.betti.append(m - rank[0])
-		self.betti_norm.append((m - rank[0]) / m)
+		self.betti_norm.append(
+			round((m - rank[0]) / m, 7)
+			)
 
 		for n_i in range(self.n-2):
 			m = len(self.skeleton['item'][n_i+1])
@@ -342,7 +351,9 @@ class WordManifold:
 
 		_, _, m = self._boundary_coo[0]
 		self.betti.append(m - rank[0])
-		self.betti_norm.append((m - rank[0]) / m)
+		self.betti_norm.append((
+			(m - rank[0]) / m, 7)
+			)
 
 
 		for n_i in range(self.n-2):
