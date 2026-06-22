@@ -412,8 +412,8 @@ class WordManifold:
 
 		_, _, m = self._boundary_coo[0]
 		self.betti.append(m - rank[0])
-		self.betti_norm.append((
-			(m - rank[0]) / m, 7)
+		self.betti_norm.append(
+			round((m - rank[0]) / m, 7)
 			)
 
 
