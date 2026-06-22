@@ -32,16 +32,20 @@ if __name__ == '__main__':
 
 	#	main processes
 	##	processes the text
-	text		= Text(path=f'{local_data}/{data_file_name}.txt', lang=lang)
+	bible		= Bible(path=f'{local_data}/{data_file_name}.txt', lang=lang)
 	if mode		== 'word':
-		text.parse_to_word()
+		bible.parse_to_word()
 	elif mode	== 'chr':
-		text.parse_to_chr()
+		bible.parse_to_chr()
 	elif mode	== 'upos':
-		text.parse_to_upos()
+		bible.parse_to_upos()
+	elif mode	== 'monkey_word':
+		bible.parse_to_monkey_word()
+	elif mode	== 'monkey_chr':
+		bible.parse_to_monkey_chr()
 
 	##	builds a word manifold to obtain the betti numbers for each dimension
-	wm	= WordManifold(parsed_text=text.parsed_sentences, n=n)
+	wm	= WordManifold(parsed_text=bible.parsed_sentences, n=n)
 	wm.get_ngram()
 	wm.get_skeleton()
 	if faster:

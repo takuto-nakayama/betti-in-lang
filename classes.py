@@ -4,7 +4,7 @@ from itertools import combinations
 from flint import fmpz_mat
 from datasets import load_dataset
 import numpy as np
-import itertools, math, random, stanza, textwrap
+import itertools, math, random, re, stanza, textwrap
 
 
 
@@ -31,7 +31,7 @@ def _rank_mod2(coo, n_rows, n_cols):
 
 
 
-class Text:
+class Bible:
 	def __init__(self, path:str, lang:str):
 		self.path = path
 		self.lang = lang
@@ -66,6 +66,40 @@ class Text:
 		'''))
 
 
+	def parse_to_monkey_word(self):
+		text = ''.join(self.text)
+		docs = stanza.Document([], text=text)
+		parsed_docs = self.parser(docs)
+		text_compressed = ''.join([w.text for w in parsed_docs.sentences[0].words])
+		num_delim = len(parsed_docs.sentences[0].words)
+		num_snt = len(self.text)
+		total = len(text_compressed) + num_delim + num_snt
+
+		set_chr = sorted(set(text_compressed))
+		dict_chr = {}
+		for c in set_chr:
+			dict_chr[c] = text_compressed.count(c)
+		items = list(dict_chr.keys())
+		prob = list(dict_chr.values())
+		monkey_text = random.choices(items,
+									 weights=prob,
+									 k=total)
+		
+		indice_delim = random.sample(range(total), num_delim)
+		indice_snt = random.sample(range(total), num_snt)
+		for i in indice_delim:
+			monkey_text[i] = '[delim]'
+		for i in indice_snt:
+			monkey_text[i] = '[snt]'
+		monkey_text = ''.join(monkey_text)
+		monkey_text = re.sub(r'(\[snt\])+', r'\1', monkey_text)
+		monkey_text = re.sub(r'(\[delim\])+', r'\1', monkey_text)
+		monkey_text = re.sub(r'(\[delim\])\[snt\]+', r'\1', monkey_text)
+		monkey_text = re.sub(r'(\[snt\])\[delim\]+', r'\1', monkey_text)
+
+		self.parsed_sentences =[tuple(snt.split('[delim]')) for snt in monkey_text.split('[snt]')]
+
+
 	def parse_to_chr(self):
 		self.parsed_sentences =self.text
 
@@ -77,6 +111,31 @@ class Text:
 		length			{len(self.parsed_sentences)}
 		{'='*50}
 		'''))
+
+
+	def parse_to_monkey_chr(self):
+			text = ''.join(self.text)
+			num_snt = len(self.text)
+			total = len(text) + num_snt
+
+			set_chr = sorted(set(text))
+			dict_chr = {}
+			for c in set_chr:
+				dict_chr[c] = text.count(c)
+			items = list(dict_chr.keys())
+			prob = list(dict_chr.values())
+			monkey_text = random.choices(items,
+										weights=prob,
+										k=total)
+			
+			indice_snt = random.sample(range(total), num_snt)
+			for i in indice_snt:
+				monkey_text[i] = '[snt]'
+			monkey_text = ''.join(monkey_text)
+			monkey_text = re.sub(r'(\[snt\])+', r'\1', monkey_text)
+			monkey_text = re.sub(r'(\s)+', r'\1', monkey_text)
+
+			self.parsed_sentences = [snt for snt in monkey_text.split('[snt]')]
 
 
 	def parse_to_upos(self):
