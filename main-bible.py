@@ -1,5 +1,5 @@
 #	import libraries
-from classes import Text, WordManifold
+from classes import Bible, WordManifold
 from dotenv import load_dotenv
 import argparse, csv, os
 
