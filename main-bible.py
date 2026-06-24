@@ -1,5 +1,5 @@
 #	import libraries
-from classes import Bible, WordManifold
+from classes import Text, WordManifold
 from dotenv import load_dotenv
 import argparse, csv, os
 
@@ -32,17 +32,17 @@ if __name__ == '__main__':
 
 	#	main processes
 	##	processes the text
-	bible		= Bible(path=f'{local_data}/{data_file_name}.txt', lang=lang)
+	text		= Text(path=f'{local_data}/{data_file_name}.txt', lang=lang)
 	if mode		== 'word':
-		bible.parse_to_word()
+		text.parse_to_word()
 	elif mode	== 'chr':
-		bible.parse_to_chr()
+		text.parse_to_chr()
 	elif mode	== 'upos':
-		bible.parse_to_upos()
+		text.parse_to_upos()
 	elif mode	== 'monkey_word':
-		bible.parse_to_monkey_word()
+		text.parse_to_monkey_word()
 	elif mode	== 'monkey_chr':
-		bible.parse_to_monkey_chr()
+		text.parse_to_monkey_chr()
 
 	##	builds a word manifold to obtain the betti numbers for each dimension
 	wm	= WordManifold(parsed_text=bible.parsed_sentences, n=n)

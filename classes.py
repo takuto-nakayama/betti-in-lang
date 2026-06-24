@@ -31,7 +31,7 @@ def _rank_mod2(coo, n_rows, n_cols):
 
 
 
-class Bible:
+class Text:
 	def __init__(self, path:str, lang:str):
 		self.path = path
 		self.lang = lang
