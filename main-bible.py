@@ -45,7 +45,7 @@ if __name__ == '__main__':
 		text.parse_to_monkey_chr()
 
 	##	builds a word manifold to obtain the betti numbers for each dimension
-	wm	= WordManifold(parsed_text=bible.parsed_sentences, n=n)
+	wm	= WordManifold(parsed_text=text.parsed_sentences, n=n)
 	wm.get_ngram()
 	wm.get_skeleton()
 	if faster:
