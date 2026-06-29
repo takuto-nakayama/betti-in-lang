@@ -8,26 +8,6 @@ import itertools, math, random, re, stanza, textwrap
 
 
 
-def _rank_mod2(coo, n_rows, n_cols):
-	cols = [set() for _ in range(n_cols)]
-	for i, j, v in coo:
-		if v % 2 != 0:
-			cols[j].symmetric_difference_update({i})
-
-	pivots = {}
-	rank = 0
-	for j in range(n_cols):
-		col = set(cols[j])
-		while col:
-			r = min(col)
-			if r not in pivots:
-				pivots[r] = j
-				cols[j] = col
-				rank += 1
-				break
-			col ^= cols[pivots[r]]
-
-	return rank
 
 
 
@@ -406,7 +386,7 @@ class WordManifold:
 		self.betti = []
 		self.betti_norm = []
 		for n_i, (coo, n_rows, n_cols) in enumerate(self._boundary_coo):
-			r = _rank_mod2(coo, n_rows, n_cols)
+			r = self._rank_mod2(coo, n_rows, n_cols)
 			print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} rank of boundary[{n_i+1}] ({n_rows}x{n_cols}) = {r}', flush=True)
 			rank.append(r)
 
@@ -435,3 +415,25 @@ class WordManifold:
 		for n, b in enumerate(self.betti):
 			print(f'|{str(n).center(5)}|{str(b).center(10)}|{str(self.betti_norm[n]).center(12)}|')
 		print('===============================')
+
+
+	def _rank_mod2(self, coo, n_rows, n_cols):
+		cols = [set() for _ in range(n_cols)]
+		for i, j, v in coo:
+			if v % 2 != 0:
+				cols[j].symmetric_difference_update({i})
+
+		pivots = {}
+		rank = 0
+		for j in range(n_cols):
+			col = set(cols[j])
+			while col:
+				r = min(col)
+				if r not in pivots:
+					pivots[r] = j
+					cols[j] = col
+					rank += 1
+					break
+				col ^= cols[pivots[r]]
+
+		return rank
