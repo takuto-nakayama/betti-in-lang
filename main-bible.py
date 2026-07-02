@@ -17,9 +17,9 @@ if __name__ == '__main__':
 	parser.add_argument('data_file_name', type=str, help='input ".txt" file name (the directory must be set in ".env").')
 	parser.add_argument('lang', type=str, help='language code (for stanza)')
 	parser.add_argument('save_file_name', type=str, help='output ".csv" file name (the directory must be set in ".env").')
-	parser.add_argument('-mode', type=str, default='word', help='unit in consideration: "word", "chr", "upos", "xpos"')
-	parser.add_argument('-n', type=int, default=7, help='max n-gram size.')
-	parser.add_argument('-faster', action='store_false', help='If true, the process uses the approximate in getting betti number.')
+	parser.add_argument('--mode', type=str, default='word', help='unit in consideration: "word", "chr", "upos", "xpos"')
+	parser.add_argument('--n', type=int, default=7, help='max n-gram size.')
+	parser.add_argument('--faster', action='store_false', help='If true, the process uses the approximate in getting betti number.')
 
 	args = parser.parse_args()
 	data_file_name	= args.data_file_name
