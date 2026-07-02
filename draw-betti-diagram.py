@@ -1,6 +1,6 @@
 import networkx as nx
 import plotly.graph_objects as go
-import argparse, json
+import argparse
 
 
 if __name__ == '__main__':
