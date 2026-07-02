@@ -5,9 +5,16 @@ import argparse, json
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
-	parser.add_argument('path', type=str)
-	parser.add_argument('--save_name', type=str, default='betti-diagram')
-	parser.add_argument('--dont_show', action='store_false')
+	parser.add_argument('path',
+						type=str,
+						help='[str] the file path of the target text')
+	parser.add_argument('--save_name',
+						type=str,
+						default='betti-diagram',
+						help='[str | default="betti-diagram"] the file name for saving the diagram (an extension (.html) will be added automatically)')
+	parser.add_argument('--dont_show',
+					 	action='store_false',
+						help='[bool | default=True] will not show the diagram immediately')
 
 	args = parser.parse_args()
 	path = args.path
