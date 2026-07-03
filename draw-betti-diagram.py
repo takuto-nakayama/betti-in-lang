@@ -1,3 +1,4 @@
+from itertools import combinations
 import networkx as nx
 import plotly.graph_objects as go
 import argparse
@@ -5,20 +6,34 @@ import argparse
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
-	parser.add_argument('path',
+	parser.add_argument(
+						'path',
 						type=str,
-						help='[str] the file path of the target text')
-	parser.add_argument('--n',
-					 type=int,
-					 default=1,
-					 help='[int] the number of n-gram that is a clique in the network.')
-	parser.add_argument('--save_name',
+						help='[str] the file path of the target text'
+	)
+	parser.add_argument(
+						'--n',
+						type=int,
+						default=1,
+						help='[int] the number of n-gram that is a loop in the network.'
+	)
+	parser.add_argument(
+						'--save_name',
 						type=str,
 						default='betti-diagram',
-						help='[str | default="betti-diagram"] the file name for saving the diagram (an extension (.html) will be added automatically)')
-	parser.add_argument('--dont_show',
-					 	action='store_false',
-						help='[bool | default=True] will not show the diagram immediately')
+						help='[str | default="betti-diagram"] the file name for saving the diagram (an extension (.html) will be added automatically)'
+	)
+	parser.add_argument(
+						'--title',
+						type=str,
+						default='Betti-Diagram',
+						help='the title that is printed on the diagram'
+	)
+	parser.add_argument(
+						'--dont_show',
+						action='store_false',
+						help='[bool | default=True] will not show the diagram immediately'
+	)
 
 	args = parser.parse_args()
 	path = args.path
@@ -36,6 +51,9 @@ if __name__ == '__main__':
 	for chr in alphabets:
 		nodes[chr] = {'label':chr}
 	edges = [(pair[0], pair[1]) for pair in bigrams]
+	num_nodes = len(nodes)
+	num_edges = len(edges)
+	num_loops = '--'
 
 
 	G = nx.DiGraph()
@@ -44,15 +62,31 @@ if __name__ == '__main__':
 	G.add_edges_from(edges)
 	pos = nx.spring_layout(G, seed=42, k=0.8)
 
-	if n > 2:
-		clique_nodes = []
+	if n >= 2:
+		loop_nodes = []
+		loop_edges = []
 		UG = G.to_undirected()
-		for clique in nx.find_cliques(UG):
-			if len(clique) >= n:
-				clique_nodes += clique
-		clique_nodes = sorted(set(clique_nodes))
-		G.remove_nodes_from([node for node in list(G.nodes()) if node not in clique_nodes])
+		num_loops = 0
+		for loop in nx.find_cliques(UG):
+			if len(loop) >= n+1:
+				loop_nodes += loop
+				loop_edges += combinations(loop, 2)
+				num_loops += 1
+		loop_nodes = sorted(set(loop_nodes))
+		num_nodes = len(loop_nodes)
+		num_edges = len(loop_edges)
 
+		G = nx.DiGraph()
+		for nid, attr in nodes.items():
+			if nid in loop_nodes:
+				G.add_node(nid, **attr)
+		G.add_edges_from(loop_edges)
+		pos = nx.spring_layout(G, seed=42, k=0.8)
+
+	bidir_count = {
+					n: sum(1 for v in G.successors(n) if G.has_edge(v, n))
+					for n in G.nodes()
+	}
 
 	edge_x, edge_y = [], []
 	for u, v in G.edges():
@@ -71,9 +105,11 @@ if __name__ == '__main__':
 
 	node_x = [pos[n][0] for n in G.nodes()]
 	node_y = [pos[n][1] for n in G.nodes()]
-	node_text = [nodes[n]["label"] for n in G.nodes()]
+	node_text = [nodes[n]["label"] if n != '\n' else '\\n' for n in G.nodes()]
 	node_hover = [
-		f'{nodes[n]['label']}<br>from: {G.out_degree(n)} / to: {G.in_degree(n)}'
+		f'{nodes[n]['label']}<br>from: {G.out_degree(n)} / to: {G.in_degree(n)} / bd: {bidir_count[n]}'
+		if n != '\n' 
+		else f'\\n<br>from: {G.out_degree(n)} / to: {G.in_degree(n)} / bd: {bidir_count[n]}'
 		for n in G.nodes()
 	]
 
@@ -92,6 +128,7 @@ if __name__ == '__main__':
 
 
 	fig = go.Figure(data=[edge_trace, node_trace])
+
 	fig.update_layout(
 		showlegend=False,
 		margin=dict(l=20, r=20, t=40, b=20),
@@ -100,6 +137,23 @@ if __name__ == '__main__':
 				scaleanchor='x', scaleratio=1),  # アスペクト比を固定
 		plot_bgcolor='white',
 		hovermode='closest',
+	)
+
+	fig.add_annotation(
+		text=(
+			f'n:     {n}<br>'
+			f'nodes: {num_nodes}<br>'
+			f'edges: {num_edges}<br>'
+			f'loops: {num_loops}'
+		),
+		xref='paper', yref='paper',
+		x=0.01, y=0.99,
+		xanchor='left', yanchor='top',
+		showarrow=False,
+		align='left',
+		font=dict(size=13, color='black'),
+		bgcolor='rgba(255,255,255,0.8)',   # 半透明の白背景
+		bordercolor='grey', borderwidth=1, borderpad=6,
 	)
 
 	fig.write_html(f'{save_name}.html', include_plotlyjs='cdn')
