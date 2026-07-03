@@ -8,6 +8,10 @@ if __name__ == '__main__':
 	parser.add_argument('path',
 						type=str,
 						help='[str] the file path of the target text')
+	parser.add_argument('--n',
+					 type=int,
+					 default=1,
+					 help='[int] the number of n-gram that is a clique in the network.')
 	parser.add_argument('--save_name',
 						type=str,
 						default='betti-diagram',
@@ -18,6 +22,7 @@ if __name__ == '__main__':
 
 	args = parser.parse_args()
 	path = args.path
+	n = args.n
 	save_name = args.save_name
 	dont_show = args.dont_show
 
@@ -38,6 +43,15 @@ if __name__ == '__main__':
 		G.add_node(nid, **attr)
 	G.add_edges_from(edges)
 	pos = nx.spring_layout(G, seed=42, k=0.8)
+
+	if n > 2:
+		clique_nodes = []
+		UG = G.to_undirected()
+		for clique in nx.find_cliques(UG):
+			if len(clique) >= n:
+				clique_nodes += clique
+		clique_nodes = sorted(set(clique_nodes))
+		G.remove_nodes_from([node for node in list(G.nodes()) if node not in clique_nodes])
 
 
 	edge_x, edge_y = [], []
