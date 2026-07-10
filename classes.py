@@ -24,7 +24,7 @@ class Text:
 
 	def parse_to_word(self):
 		self.parsed_sentences = []
-		docs = [stanza.Document([], text=snt) for snt in self.text]
+		docs = stanza.Document([], text=self.text)
 		parsed_docs = self.parser(docs)
 		for snt in parsed_docs.sentences:
 			self.parsed_sentences.append(
