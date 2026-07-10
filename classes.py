@@ -8,9 +8,6 @@ import itertools, math, random, re, stanza, textwrap
 
 
 
-
-
-
 class Text:
 	def __init__(self, path:str, lang:str):
 		self.path = path
@@ -29,13 +26,13 @@ class Text:
 		self.parsed_sentences = []
 		docs = [stanza.Document([], text=snt) for snt in self.text]
 		parsed_docs = self.parser(docs)
-		for parsed in parsed_docs:
+		for snt in parsed_docs.sentences:
 			self.parsed_sentences.append(
 				tuple(
-					w.text for w in parsed.sentences[0].words
+					w.text for w in snt.words
 				)
 			)
-		
+
 		print(textwrap.dedent(f'''
 		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into word is done.
 		{'='*50}
@@ -47,37 +44,32 @@ class Text:
 
 
 	def parse_to_monkey_word(self):
-		text = ''.join(self.text)
-		docs = stanza.Document([], text=text)
+		docs = stanza.Document([], text=self.text)
 		parsed_docs = self.parser(docs)
-		text_compressed = ''.join([w.text for w in parsed_docs.sentences[0].words])
-		num_delim = len(parsed_docs.sentences[0].words)
+
+		words = []
+		for snt in parsed_docs.sentences:
+			words += [w.text for w in snt.words]
+
 		num_snt = len(self.text)
-		total = len(text_compressed) + num_delim + num_snt
+		total = len(words) + num_snt
 
-		set_chr = sorted(set(text_compressed))
-		dict_chr = {}
-		for c in set_chr:
-			dict_chr[c] = text_compressed.count(c)
-		items = list(dict_chr.keys())
-		prob = list(dict_chr.values())
-		monkey_text = random.choices(items,
-									 weights=prob,
-									 k=total)
-		
-		indice_delim = random.sample(range(total), num_delim)
-		indice_snt = random.sample(range(total), num_snt)
-		for i in indice_delim:
-			monkey_text[i] = '[delim]'
-		for i in indice_snt:
-			monkey_text[i] = '[snt]'
-		monkey_text = ''.join(monkey_text)
-		monkey_text = re.sub(r'(\[snt\])+', r'\1', monkey_text)
-		monkey_text = re.sub(r'(\[delim\])+', r'\1', monkey_text)
-		monkey_text = re.sub(r'(\[delim\])\[snt\]+', r'\1', monkey_text)
-		monkey_text = re.sub(r'(\[snt\])\[delim\]+', r'\1', monkey_text)
+		set_words = sorted(set(words))
+		dict_words = {w:words.count(w) for w in set_words}
+		items = list(dict_words.keys())
+		prob = list(dict_words.values())
+		monkey_text = random.choices(
+			items,
+			weights=prob,
+			k=total
+		)
 
-		self.parsed_sentences =[tuple(snt.split('[delim]')) for snt in monkey_text.split('[snt]')]
+		self.parsed_sentences = []
+		indice_snt = sorted(random.sample(range(total), num_snt))
+		cnt = 0
+		for sep in indice_snt:
+			self.parsed_sentences.append(tuple(monkey_text[cnt:sep]))
+			cnt = sep + 1
 
 
 	def parse_to_chr(self):
@@ -104,10 +96,12 @@ class Text:
 				dict_chr[c] = text.count(c)
 			items = list(dict_chr.keys())
 			prob = list(dict_chr.values())
-			monkey_text = random.choices(items,
-										weights=prob,
-										k=total)
-			
+			monkey_text = random.choices(
+				items,
+				weights=prob,
+				k=total
+			)
+
 			indice_snt = random.sample(range(total), num_snt)
 			for i in indice_snt:
 				monkey_text[i] = '[snt]'
@@ -390,7 +384,7 @@ class WordManifold:
 			print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} rank of boundary[{n_i+1}] ({n_rows}x{n_cols}) = {r}', flush=True)
 			rank.append(r)
 
-		_, _, m = self._boundary_coo[0]
+		_, m, _ = self._boundary_coo[0]
 		self.betti.append(m - rank[0])
 		self.betti_norm.append(
 			round((m - rank[0]) / m, 7)
