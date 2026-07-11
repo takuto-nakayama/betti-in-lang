@@ -526,7 +526,7 @@ class Network:
 		
 		if save:
 			fig.write_html(f'{save_path}-1.html', include_plotlyjs='cdn')
-			print(f'n=1: : saved to {save_path}-{n_i-1}.html ({datetime.now().strftime("%Y-%m-%d %H:%M:%S")})')
+			print(f'n=1: : saved to {save_path}-1.html ({datetime.now().strftime("%Y-%m-%d %H:%M:%S")})')
 
 		if not dont_show:
 			fig.show()
