@@ -1,5 +1,7 @@
 from collections import Counter
 from datetime import datetime
+import networkx as nx
+import plotly.graph_objects as go
 from itertools import combinations
 from flint import fmpz_mat
 from datasets import load_dataset
@@ -431,3 +433,222 @@ class WordManifold:
 				col ^= cols[pivots[r]]
 
 		return rank
+	
+
+class Network:
+	def __init__(self, text_path:str):
+		with open(text_path, 'r') as f:
+			self.text = f.read()
+		self.G = nx.DiGraph()
+
+	def draw_network_1(self, title:str='network', save_path:str='network-1', save:bool=False, dont_show:bool=False):
+		initial_nodes = sorted(set(self.text))
+		initial_edges = sorted(set([(self.text[i], self.text[i+1]) for i in range(len(self.text)-1)]))
+		self.skeleta = [''.join(edge) for edge in initial_edges]
+
+		for node in initial_nodes:
+			self.G.add_node(node, **{'label':node})
+		self.G.add_edges_from(initial_edges)
+		position = nx.spring_layout(self.G, seed=42, k=0.8)
+
+		bidir_count = {
+			node: sum(1 for v in self.G.successors(node) if self.G.has_edge(v, node))
+			for node in self.G.nodes()
+		}
+
+
+		edge_x, edge_y = [], []
+		for u, v in self.G.edges():
+			x0, y0 = position[u]
+			x1, y1 = position[v]
+			edge_x += [x0, x1, None]
+			edge_y += [y0, y1, None]
+
+		edge_trace = go.Scatter(
+			x=edge_x, y=edge_y,
+			mode="lines",
+			line=dict(width=0.5, color='grey'),
+			hoverinfo="none",
+		)
+
+		node_x = [position[node][0] for node in self.G.nodes()]
+		node_y = [position[node][1] for node in self.G.nodes()]
+		node_text = [node if node != '\n' else '\\n' for node in self.G.nodes()]
+		# ホバー時に出る詳細（次数なども入れられる）
+		node_hover = [
+			f'{node}<br>from: {self.G.out_degree(node)} / to: {self.G.in_degree(node)} / bd: {bidir_count[node]}'
+			if node != '\n' 
+			else f'\\n<br>from: {self.G.out_degree(node)} / to: {self.G.in_degree(node)} / bd: {bidir_count[node]}'
+			for node in self.G.nodes()
+		]
+
+		node_trace = go.Scatter(
+		x=node_x, y=node_y,
+		mode="markers+text",          # マーカー + 常時表示ラベル
+		marker=dict(
+			size=5,
+			line=dict(width=0.5),
+			color='#636efa'),
+		text=node_text,               # マーカー脇に出る固定ラベル
+		textposition="top center",
+		textfont=dict(size=13),
+		hovertext=node_hover,         # ホバーで出る詳細
+		hoverinfo="text")
+
+		# --- 図の組み立て ---
+		fig = go.Figure(data=[edge_trace, node_trace])
+		fig.update_layout(
+			showlegend=False,
+			margin=dict(l=20, r=20, t=40, b=20),
+			xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+			yaxis=dict(showgrid=False, zeroline=False, showticklabels=False,
+					scaleanchor="x", scaleratio=1),  # アスペクト比を固定
+			plot_bgcolor="white",
+			hovermode="closest",
+			title=title
+		)
+
+		fig.add_annotation(
+				text=(
+					f'n:       1<br>'
+					f'nodes:   {len(self.G.nodes)}<br>'
+					f'edges:   {len(self.G.edges)}<br>'
+				),
+				xref='paper', yref='paper',
+				x=0.01, y=0.99,
+				xanchor='left', yanchor='top',
+				showarrow=False,
+				align='left',
+				font=dict(size=13, color='black'),
+				bgcolor='rgba(255,255,255,0.8)',
+				bordercolor='grey', borderwidth=1, borderpad=6,
+			)
+		
+		if save:
+			fig.write_html(f'{save_path}-1.html', include_plotlyjs='cdn')
+			print(f'n=1: saved to {save_path}-1.html')
+
+		if not dont_show:
+			fig.show()
+
+
+
+	def draw_network_n(self, n, title:str='network', save_path:str='network-', save:bool=False, dont_show:bool=False):
+		if n < 2:
+			print('n is too small.\nIt must be greater than or eualt to 2.')
+		
+		else:
+			for n_i in range(3, n+2):
+				previous_skeleta = self.skeleta
+
+				ngrams = sorted(
+					set(
+						[self.text[i:i+n_i] for i in range(len(self.text)-n_i+1)]
+					)
+				)
+
+				new_nodes = []
+				new_edges = []
+				self.skeleta = []
+				for ngram in ngrams:
+					sub_gram = [ngram[:k] + ngram[k+1:] for k in range(n_i)]
+					if all(x in set(previous_skeleta) for x in sub_gram):
+						new_nodes += [g for g in ngram]
+						new_edges += [c for c in combinations(ngram, 2)]
+						self.skeleta.append(ngram)
+				new_nodes = sorted(set(new_nodes))
+				new_edges = sorted(set(new_edges))
+				self.skeleta = sorted(set(self.skeleta))
+
+
+				self.G = nx.DiGraph()
+				for new_node in new_nodes:
+					self.G.add_node(new_node, **{'label':new_node})
+				self.G.add_edges_from(new_edges)
+				position = nx.spring_layout(self.G, seed=42, k=0.8)
+
+				if not self.G.nodes():
+					print(f'n_i={n_i}: no valid simplices found, process terminated.')
+					break
+
+				bidir_count = {
+					node: sum(1 for v in self.G.successors(node) if self.G.has_edge(v, node))
+					for node in self.G.nodes()
+				}
+
+
+				edge_x, edge_y = [], []
+				for u, v in self.G.edges():
+					x0, y0 = position[u]
+					x1, y1 = position[v]
+					edge_x += [x0, x1, None]   # None で線を分割
+					edge_y += [y0, y1, None]
+
+				edge_trace = go.Scatter(
+					x=edge_x, y=edge_y,
+					mode="lines",
+					line=dict(width=0.5, color='grey'),
+					hoverinfo="none",
+				)
+
+				node_x = [position[node][0] for node in self.G.nodes()]
+				node_y = [position[node][1] for node in self.G.nodes()]
+				node_text = [node if node != '\n' else '\\n' for node in self.G.nodes()]
+				# ホバー時に出る詳細（次数なども入れられる）
+				node_hover = [
+					f'{node}<br>from: {self.G.out_degree(node)} / to: {self.G.in_degree(node)} / bd: {bidir_count[node]}'
+					if node != '\n'
+					else f'\\n<br>from: {self.G.out_degree(node)} / to: {self.G.in_degree(node)} / bd: {bidir_count[node]}'
+					for node in self.G.nodes()
+				]
+
+				node_trace = go.Scatter(
+				x=node_x, y=node_y,
+				mode="markers+text",          # マーカー + 常時表示ラベル
+				marker=dict(
+					size=5,
+					line=dict(width=0.5),
+					color='#636efa'),
+				text=node_text,               # マーカー脇に出る固定ラベル
+				textposition="top center",
+				textfont=dict(size=13),
+				hovertext=node_hover,         # ホバーで出る詳細
+				hoverinfo="text")
+
+				# --- 図の組み立て ---
+				fig = go.Figure(data=[edge_trace, node_trace])
+				fig.update_layout(
+					showlegend=False,
+					margin=dict(l=20, r=20, t=40, b=20),
+					xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+					yaxis=dict(showgrid=False, zeroline=False, showticklabels=False,
+							scaleanchor="x", scaleratio=1),  # アスペクト比を固定
+					plot_bgcolor="white",
+					hovermode="closest",
+					title=title
+				)
+
+				fig.add_annotation(
+						text=(
+							f'n:       {n_i-1}<br>'
+							f'nodes:   {len(self.G.nodes)}<br>'
+							f'edges:   {len(self.G.edges)}<br>'
+							f'skeleta: {len(self.skeleta)}'
+						),
+						xref='paper', yref='paper',
+						x=0.01, y=0.99,
+						xanchor='left', yanchor='top',
+						showarrow=False,
+						align='left',
+						font=dict(size=13, color='black'),
+						bgcolor='rgba(255,255,255,0.8)',
+						bordercolor='grey', borderwidth=1, borderpad=6,
+					)
+
+
+				if save:
+					fig.write_html(f'{save_path}-{n_i-1}.html', include_plotlyjs='cdn')
+					print(f'n={n_i-1}: saved to {save_path}-{n_i-1}.html')
+
+				if not dont_show:
+					fig.show()
