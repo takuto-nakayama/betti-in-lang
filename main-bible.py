@@ -20,6 +20,7 @@ if __name__ == '__main__':
 	parser.add_argument('--mode', type=str, default='word', help='unit in consideration: "word", "chr", "upos", "xpos"')
 	parser.add_argument('--n', type=int, default=7, help='max n-gram size.')
 	parser.add_argument('--faster', action='store_false', help='If true, the process uses the approximate in getting betti number.')
+	parser.add_argument('--seed', type=int, default=42)
 
 	args = parser.parse_args()
 	data_file_name	= args.data_file_name
@@ -28,6 +29,7 @@ if __name__ == '__main__':
 	mode			= args.mode
 	n				= args.n
 	faster			= args.faster
+	seed			= args.seed
 
 
 	#	main processes
@@ -40,9 +42,9 @@ if __name__ == '__main__':
 	elif mode	== 'upos':
 		text.parse_to_upos()
 	elif mode	== 'monkey_word':
-		text.parse_to_monkey_word()
+		text.parse_to_monkey_word(seed=seed)
 	elif mode	== 'monkey_chr':
-		text.parse_to_monkey_chr()
+		text.parse_to_monkey_chr(seed=seed)
 
 	##	builds a word manifold to obtain the betti numbers for each dimension
 	wm	= WordManifold(parsed_text=text.parsed_sentences, n=n)

@@ -43,10 +43,10 @@ class Text:
 		'''))
 
 
-	def parse_to_monkey_word(self):
+	def parse_to_monkey_word(self, seed:int=42):
 		docs = stanza.Document([], text=self.text)
 		parsed_docs = self.parser(docs)
-
+		random.seed(seed)
 		words = []
 		for snt in parsed_docs.sentences:
 			words += [w.text for w in snt.words]
@@ -54,8 +54,9 @@ class Text:
 		num_snt = len(self.text)
 		total = len(words) + num_snt
 
-		set_words = sorted(set(words))
-		dict_words = {w:words.count(w) for w in set_words}
+		word_counter = Counter(words)
+		set_words = sorted(word_counter)
+		dict_words = word_counter
 		items = list(dict_words.keys())
 		prob = list(dict_words.values())
 		monkey_text = random.choices(
@@ -85,10 +86,11 @@ class Text:
 		'''))
 
 
-	def parse_to_monkey_chr(self):
+	def parse_to_monkey_chr(self, seed:int=42):
 			text = ''.join(self.text)
 			num_snt = len(self.text)
 			total = len(text) + num_snt
+			random.seed(seed)
 
 			set_chr = sorted(set(text))
 			dict_chr = {}
