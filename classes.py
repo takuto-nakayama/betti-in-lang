@@ -234,7 +234,7 @@ class WordManifold:
 		for n_i in range(1,self.n+1):
 			ngram_i = []
 			for snt in self.parsed_text:
-				for i in range(self.n-n_i+1):
+				for i in range(len(snt)-n_i+1):
 					ngram_i.append(snt[i:i+n_i])
 			ngram_i_counter = Counter(ngram_i)
 			ngram.append(sorted(ngram_i_counter))
