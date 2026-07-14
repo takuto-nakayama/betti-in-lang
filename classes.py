@@ -73,6 +73,15 @@ class Text:
 		for sep in indice_snt:
 			self.parsed_sentences.append(tuple(monkey_text[cnt:sep]))
 			cnt = sep + 1
+		
+		print(textwrap.dedent(f'''
+		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into word is done.
+		{'='*50}
+		text source:		{self.path}
+		language:		{self.lang}
+		length			{len(self.parsed_sentences)}
+		{'='*50}
+		'''))
 
 
 	def parse_to_chr(self):
@@ -89,31 +98,40 @@ class Text:
 
 
 	def parse_to_monkey_chr(self, seed:int=42):
-			text = ''.join(self.text)
-			num_snt = len(self.text)
-			total = len(text) + num_snt
-			random.seed(seed)
+		text = ''.join(self.text)
+		num_snt = len(self.text)
+		total = len(text) + num_snt
+		random.seed(seed)
 
-			set_chr = sorted(set(text))
-			dict_chr = {}
-			for c in set_chr:
-				dict_chr[c] = text.count(c)
-			items = list(dict_chr.keys())
-			prob = list(dict_chr.values())
-			monkey_text = random.choices(
-				items,
-				weights=prob,
-				k=total
-			)
+		set_chr = sorted(set(text))
+		dict_chr = {}
+		for c in set_chr:
+			dict_chr[c] = text.count(c)
+		items = list(dict_chr.keys())
+		prob = list(dict_chr.values())
+		monkey_text = random.choices(
+			items,
+			weights=prob,
+			k=total
+		)
 
-			indice_snt = random.sample(range(total), num_snt)
-			for i in indice_snt:
-				monkey_text[i] = '[snt]'
-			monkey_text = ''.join(monkey_text)
-			monkey_text = re.sub(r'(\[snt\])+', r'\1', monkey_text)
-			monkey_text = re.sub(r'(\s)+', r'\1', monkey_text)
+		indice_snt = random.sample(range(total), num_snt)
+		for i in indice_snt:
+			monkey_text[i] = '[snt]'
+		monkey_text = ''.join(monkey_text)
+		monkey_text = re.sub(r'(\[snt\])+', r'\1', monkey_text)
+		monkey_text = re.sub(r'(\s)+', r'\1', monkey_text)
 
-			self.parsed_sentences = [snt for snt in monkey_text.split('[snt]')]
+		self.parsed_sentences = [snt for snt in monkey_text.split('[snt]')]
+
+		print(textwrap.dedent(f'''
+		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into word is done.
+		{'='*50}
+		text source:		{self.path}
+		language:		{self.lang}
+		length			{len(self.parsed_sentences)}
+		{'='*50}
+		'''))
 
 
 	def parse_to_upos(self):
