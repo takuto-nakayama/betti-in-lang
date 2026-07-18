@@ -136,12 +136,12 @@ class Text:
 
 	def parse_to_upos(self):
 		self.parsed_sentences = []
-		docs = [stanza.Document([], text=snt) for snt in self.text]
+		docs = stanza.Document([], text=self.text)
 		parsed_docs = self.parser(docs)
-		for parsed in parsed_docs:
+		for snt in parsed_docs.sentences:
 			self.parsed_sentences.append(
 				tuple(
-					w.upos for w in parsed.sentences[0].words
+					w.upos for w in snt.words
 				)
 			)
 		
@@ -158,7 +158,7 @@ class Text:
 
 
 class Wiki:
-	def __init__(self, wiki_config:str, lang:str, batch:int):
+	def __init__(self, wiki_config:str, lang:str, batch:int, seed:int=42):
 		self.wiki_config = wiki_config
 		self.lang = lang
 		self.parser	= stanza.Pipeline(
@@ -167,6 +167,7 @@ class Wiki:
 			tokenize_no_ssplit=True,
 			use_gpu=True
 			)
+		random.seed(seed)
 
 
 		dataset = load_dataset('wikimedia/wikipedia', wiki_config, split='train')
@@ -182,15 +183,15 @@ class Wiki:
 
 	def parse_to_word(self):
 		self.parsed_sentences = []
-		docs = [stanza.Document([], text=snt) for snt in self.sentences]
+		docs = stanza.Document([], text=self.sentences)
 		parsed_docs = self.parser(docs)
-		for parsed in parsed_docs:
+		for snt in parsed_docs.sentences:
 			self.parsed_sentences.append(
 				tuple(
-					w.text for w in parsed.sentences[0].words
+					w.text for w in snt.words
 				)
 			)
-		
+
 		print(textwrap.dedent(f'''
 		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into word is done.
 		{'='*50}
@@ -218,12 +219,12 @@ class Wiki:
 
 	def parse_to_upos(self):
 		self.parsed_sentences = []
-		docs = [stanza.Document([], text=snt) for snt in self.sentences]
+		docs = stanza.Document([], text=self.sentences)
 		parsed_docs = self.parser(docs)
-		for parsed in parsed_docs:
+		for snt in parsed_docs.sentences:
 			self.parsed_sentences.append(
 				tuple(
-					w.upos for w in parsed.sentences[0].words
+					w.upos for w in snt.words
 				)
 			)
 		

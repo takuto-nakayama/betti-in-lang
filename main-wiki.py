@@ -19,6 +19,7 @@ if __name__ == '__main__':
 	parser.add_argument('--batch', type=int, default=3000, help='batch size of Wikipedia articles per cycle')
 	parser.add_argument('--mode', type=str, default='word', help='unit in consideration: "word", "chr", "upos", "xpos"')
 	parser.add_argument('--n', type=int, default=7, help='max n-gram size.')
+	parser.add_argument('--seed', type=int, default=42, help='random seed to sample wikipedia articles.')
 	parser.add_argument('--faster', action='store_false', help='If true, the process uses the approximate in getting betti number.')
 
 	args = parser.parse_args()
@@ -28,12 +29,13 @@ if __name__ == '__main__':
 	batch			= args.batch
 	mode			= args.mode
 	n				= args.n
+	seed			= args.seed
 	faster			= args.faster
 
 
 	#	main processes
 	##	processes the wiki articles
-	wiki		= Wiki(wiki_config=wiki_config, lang=lang, batch=batch)
+	wiki		= Wiki(wiki_config=wiki_config, lang=lang, batch=batch, seed=seed)
 	if mode		== 'word':
 		wiki.parse_to_word()
 	elif mode	== 'chr':
