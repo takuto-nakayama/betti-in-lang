@@ -171,6 +171,7 @@ class Wiki:
 
 
 		dataset = load_dataset('wikimedia/wikipedia', wiki_config, split='train')
+		batch = min(batch, len(dataset))
 		indices = random.sample(range(len(dataset)), k=batch)
 		sampled = dataset.select(indices)
 		self.sentences = []
