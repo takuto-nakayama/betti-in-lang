@@ -171,8 +171,8 @@ class Wiki:
 
 
 		dataset = load_dataset('wikimedia/wikipedia', wiki_config, split='train')
-		batch = min(batch, len(dataset))
-		indices = random.sample(range(len(dataset)), k=batch)
+		self.batch = min(batch, len(dataset))
+		indices = random.sample(range(len(dataset)), k=self.batch)
 		sampled = dataset.select(indices)
 		self.sentences = []
 
@@ -184,14 +184,20 @@ class Wiki:
 
 	def parse_to_word(self):
 		self.parsed_sentences = []
-		docs = stanza.Document([], text=self.sentences)
-		parsed_docs = self.parser(docs)
-		for snt in parsed_docs.sentences:
-			self.parsed_sentences.append(
-				tuple(
-					w.text for w in snt.words
+		self.sentences = sorted(self.sentences, key=len)
+		chunk_size = self.batch // 10
+
+		for idx in range(0, len(self.sentences), chunk_size):
+			text_chnk = self.sentences[idx:min(idx+chunk_size, len(self.sentences)-1)]
+
+			docs = stanza.Document([], text=text_chnk)
+			parsed_docs = self.parser(docs)
+			for snt in parsed_docs.sentences:
+				self.parsed_sentences.append(
+					tuple(
+						w.text for w in snt.words
+					)
 				)
-			)
 
 		print(textwrap.dedent(f'''
 		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into word is done.
@@ -220,14 +226,21 @@ class Wiki:
 
 	def parse_to_upos(self):
 		self.parsed_sentences = []
-		docs = stanza.Document([], text=self.sentences)
-		parsed_docs = self.parser(docs)
-		for snt in parsed_docs.sentences:
-			self.parsed_sentences.append(
-				tuple(
-					w.upos for w in snt.words
+		self.sentences = sorted(self.sentences, key=len)
+		chunk_size = self.batch // 10
+
+		for idx in range(0, len(self.sentences), chunk_size):
+			text_chnk = self.sentences[idx:min(idx+chunk_size, len(self.sentences)-1)]
+
+			docs = stanza.Document([], text=text_chnk)
+			docs = stanza.Document([], text=self.sentences)
+			parsed_docs = self.parser(docs)
+			for snt in parsed_docs.sentences:
+				self.parsed_sentences.append(
+					tuple(
+						w.upos for w in snt.words
+					)
 				)
-			)
 		
 		print(textwrap.dedent(f'''
 		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into upos is done.
