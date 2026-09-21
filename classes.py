@@ -45,32 +45,6 @@ class Text:
 		'''))
 
 
-	def parse_to_monkey_word(self, seed:int, total:int=100000):
-		docs = stanza.Document([], text=self.text)
-		parsed_docs = self.parser(docs)
-		random.seed(seed)
-		words = []
-		for snt in parsed_docs.sentences:
-			words += [w.text for w in snt.words]
-
-		dict_words = Counter(words)
-		items = list(dict_words.keys())
-		prob = list(dict_words.values())
-		self.parsed_sentences = random.choices(
-			items,
-			weights=prob,
-			k=total
-		)
-		self.parsed_sentences = [self.parsed_sentences]
-
-		print(textwrap.dedent(f'''
-		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into word is done.
-		{'='*50}
-		text source:		{self.path}
-		language:		{self.lang}
-		'''))
-
-
 	def parse_to_chr(self):
 		self.parsed_sentences =self.text
 
@@ -81,31 +55,6 @@ class Text:
 		language:		{self.lang}
 		length			{len(self.parsed_sentences)}
 		{'='*50}
-		'''))
-
-
-	def parse_to_monkey_chr(self, seed:int, total:int):
-		text = ''.join(self.text)
-		random.seed(seed)
-
-		set_chr = sorted(set(text))
-		dict_chr = {}
-		for c in set_chr:
-			dict_chr[c] = text.count(c)
-		items = list(dict_chr.keys())
-		prob = list(dict_chr.values())
-		self.parsed_sentences = random.choices(
-			items,
-			weights=prob,
-			k=total
-		)
-		self.parsed_sentences = [''.join(self.parsed_sentences)]
-
-		print(textwrap.dedent(f'''
-		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into word is done.
-		{'='*50}
-		text source:		{self.path}
-		language:		{self.lang}
 		'''))
 
 
@@ -130,32 +79,114 @@ class Text:
 		'''))
 
 
-	def parse_to_moneky_upos(self, seed:int, total:int):
-		random.seed(seed)
+
+class TextMonkey:
+	def __init__(self, path:str, lang:str):
+		self.path = path
+		self.lang = lang
+		self.parser	= stanza.Pipeline(
+			self.lang,
+			processors='tokenize,pos',
+			tokenize_no_ssplit=True,
+			use_gpu=True
+		)
+
+
+	def count_word(self):
+		words = []
+		with open(self.path, mode='r', encoding='utf-8') as f:
+			self.text = [line.strip() for line in f.readlines()]
+		docs = stanza.Document([], text=self.text)
+		parsed_docs = self.parser(docs)
+		for snt in parsed_docs.sentences:
+			for w in snt.words:
+				words.append(w.text)
+		self.dict_tokens = Counter(words)
+
+		print(textwrap.dedent(f'''
+		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into word is done.
+		{'='*50}
+		text source:		{self.path}
+		language:		{self.lang}
+		{'='*50}
+		'''))
+
+
+	def count_chr(self):
+		self.set_tokens = []
+		with open(self.path, mode='r', encoding='utf-8') as f:
+			self.text = f.read()
+		self.dict_tokens = Counter(self.text)
+
+		print(textwrap.dedent(f'''
+		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into chr is done.
+		{'='*50}
+		text source:		{self.path}
+		language:		{self.lang}
+		{'='*50}
+		'''))
+
+
+	def count_upos(self):
 		upos = []
+		with open(self.path, mode='r', encoding='utf-8') as f:
+			self.text	= [line.strip() for line in f.readlines()]
 		docs = stanza.Document([], text=self.text)
 		parsed_docs = self.parser(docs)
 		for snt in parsed_docs.sentences:
 			for w in snt.words:
 				upos.append(w.upos)
-	
-		dict_upos = Counter(upos)
-		items = list(dict_upos.keys())
-		prob = list(dict_upos.values())
-		self.parsed_sentences = random.choices(
+		self.dict_tokens = Counter(upos)
+
+		print(textwrap.dedent(f'''
+		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into chr is done.
+		{'='*50}
+		text source:		{self.path}
+		language:		{self.lang}
+		{'='*50}
+		'''))
+
+
+	def generate_monkey_chr(self, seed:int, total:int):
+		random.seed(seed)
+		items = list(self.dict_tokens.keys())
+		prob = list(self.dict_tokens.values())
+		monkey_doc = random.choices(
 			items,
 			weights=prob,
 			k=total
 		)
-		self.parsed_sentences = [self.parsed_sentences]
+		monkey_doc = [''.join(monkey_doc)]
 
-		print(textwrap.dedent(f'''
-		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into upos is done.
-		{'='*50}
-		text source:		{self.path}
-		language:		{self.lang}
-		'''))
+		return monkey_doc
 
+
+	def generate_monkey_word(self, seed:int, total:int):
+		random.seed(seed)
+		items = list(self.dict_tokens.keys())
+		prob = list(self.dict_tokens.values())
+		monkey_doc = random.choices(
+			items,
+			weights=prob,
+			k=total
+		)
+		monkey_doc = [monkey_doc]
+
+		return monkey_doc
+
+
+	def generate_monkey_upos(self, seed:int, total:int):
+		random.seed(seed)
+		items = list(self.dict_tokens.keys())
+		prob = list(self.dict_tokens.values())
+		monkey_doc = random.choices(
+			items,
+			weights=prob,
+			k=total
+		)
+		monkey_doc = [monkey_doc]
+
+		return monkey_doc
 
 
 
@@ -212,70 +243,8 @@ class Wiki:
 		'''))
 
 
-	def parse_to_monkey_word(self, seed:int, total:int):
-		random.seed(seed)
-		words = []
-		self.sentences = sorted(self.sentences, key=len)
-		chunk_size = self.batch // 10
-
-		for idx in range(0, len(self.sentences), chunk_size):
-			text_chnk = self.sentences[idx:min(idx+chunk_size, len(self.sentences)-1)]
-
-			docs = stanza.Document([], text=text_chnk)
-			parsed_docs = self.parser(docs)
-			for snt in parsed_docs.sentences:
-				for w in snt.words:
-					words.append(w.text)
-
-		dict_words = Counter(words)
-		items = list(dict_words.keys())
-		prob = list(dict_words.values())
-		self.parsed_sentences = random.choices(
-			items,
-			weights=prob,
-			k=total
-		)
-		self.parsed_sentences = [self.parsed_sentences]
-
-
-		print(textwrap.dedent(f'''
-		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into word is done.
-		{'='*50}
-		text source:		{self.wiki_config}
-		language:		{self.lang}
-		{'='*50}
-		'''))
-
-
-
 	def parse_to_chr(self):
 		self.parsed_sentences =self.sentences
-
-		print(textwrap.dedent(f'''
-		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into character is done.
-		{'='*50}
-		text source:		{self.wiki_config}
-		language:		{self.lang}
-		{'='*50}
-		'''))
-
-
-	def parse_to_monkey_chr(self, seed:int, total:int):
-		chrs = ''.join(self.sentences)
-		random.seed(seed)
-
-		set_chr = sorted(set(chrs))
-		dict_chr = {}
-		for c in set_chr:
-			dict_chr[c] = chrs.count(c)
-		items = list(dict_chr.keys())
-		prob = list(dict_chr.values())
-		self.parsed_sentences = random.choices(
-			items,
-			weights=prob,
-			k=total
-		)
-		self.parsed_sentences = [''.join(self.parsed_sentences)]
 
 		print(textwrap.dedent(f'''
 		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into character is done.
@@ -314,8 +283,69 @@ class Wiki:
 		'''))
 
 
-	def parse_to_monkey_upos(self, seed:int, total:int):
+
+class WikiMonkey:
+	def __init__(self, wiki_config:str, lang:str, batch:int, seed:int):
+		self.wiki_config = wiki_config
+		self.lang = lang
+		self.parser	= stanza.Pipeline(
+			self.lang,
+			processors='tokenize,pos',
+			tokenize_no_ssplit=True,
+			use_gpu=True
+			)
 		random.seed(seed)
+
+		dataset = load_dataset('wikimedia/wikipedia', wiki_config, split='train')
+		self.batch = min(batch, len(dataset))
+		indices = random.sample(range(len(dataset)), k=self.batch)
+		sampled = dataset.select(indices)
+		self.sentences = []
+
+		for article in sampled:
+			for para in article['text'].split('\n'):
+				if para.strip():
+					self.sentences.append(para.strip())
+
+
+	def count_word(self):
+		words = []
+		self.sentences = sorted(self.sentences, key=len)
+		chunk_size = self.batch // 10
+
+		for idx in range(0, len(self.sentences), chunk_size):
+			text_chnk = self.sentences[idx:min(idx+chunk_size, len(self.sentences)-1)]
+
+			docs = stanza.Document([], text=text_chnk)
+			parsed_docs = self.parser(docs)
+			for snt in parsed_docs.sentences:
+				for w in snt.words:
+					words.append(w.text)
+		self.dict_word = Counter(words)
+
+		print(textwrap.dedent(f'''
+		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into word is done.
+		{'='*50}
+		text source:		{self.wiki_config}
+		language:		{self.lang}
+		{'='*50}
+		'''))
+
+
+	def count_chr(self):
+		chrs = ''.join(self.sentences)
+		self.dict_chr = Counter(chrs)
+		
+		print(textwrap.dedent(f'''
+		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into character is done.
+		{'='*50}
+		text source:		{self.wiki_config}
+		language:		{self.lang}
+		{'='*50}
+		'''))
+
+
+	def count_upos(self):
 		upos = []
 		self.sentences = sorted(self.sentences, key=len)
 		chunk_size = self.batch // 10
@@ -329,15 +359,7 @@ class Wiki:
 				for w in snt.words:
 					upos.append(w.upos)
 	
-		dict_upos = Counter(upos)
-		items = list(dict_upos.keys())
-		prob = list(dict_upos.values())
-		self.parsed_sentences = random.choices(
-			items,
-			weights=prob,
-			k=total
-		)
-		self.parsed_sentences = [self.parsed_sentences]
+		self.dict_upos = Counter(upos)
 
 		print(textwrap.dedent(f'''
 		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into upos is done.
@@ -345,6 +367,48 @@ class Wiki:
 		text source:		{self.path}
 		language:		{self.lang}
 		'''))
+
+
+	def generate_monkey_chr(self, seed:int, total:int):
+		random.seed(seed)
+		items = list(self.dict_chr.keys())
+		prob = list(self.dict_chr.values())
+		monkey_doc = random.choices(
+			items,
+			weights=prob,
+			k=total
+		)
+		monkey_doc = [''.join(monkey_doc)]
+
+		return monkey_doc
+
+
+	def generate_monkey_word(self, seed:int, total:int):
+		random.seed(seed)
+		items = list(self.dict_word.keys())
+		prob = list(self.dict_word.values())
+		monkey_doc = random.choices(
+			items,
+			weights=prob,
+			k=total
+		)
+		monkey_doc = [monkey_doc]
+
+		return monkey_doc
+
+
+	def generate_monkey_upos(self, seed:int, total:int):
+		random.seed(seed)
+		items = list(self.dict_upos.keys())
+		prob = list(self.dict_upos.values())
+		monkey_doc = random.choices(
+			items,
+			weights=prob,
+			k=total
+		)
+		monkey_doc = [monkey_doc]
+
+		return monkey_doc
 
 
 
