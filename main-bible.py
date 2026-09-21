@@ -42,9 +42,11 @@ if __name__ == '__main__':
 	elif mode	== 'upos':
 		text.parse_to_upos()
 	elif mode	== 'monkey_word':
-		text.parse_to_monkey_word(seed=seed)
+		text.parse_to_monkey_word(seed=seed, total=100000)
 	elif mode	== 'monkey_chr':
-		text.parse_to_monkey_chr(seed=seed)
+		text.parse_to_monkey_chr(seed=seed, total=100000)
+	elif mode == 'monkey_upos':
+		text.parse_to_moneky_upos(seed=seed, total=100000)
 
 	##	builds a word manifold to obtain the betti numbers for each dimension
 	wm	= WordManifold(parsed_text=text.parsed_sentences, n=n)

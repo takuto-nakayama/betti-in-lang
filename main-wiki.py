@@ -42,6 +42,13 @@ if __name__ == '__main__':
 		wiki.parse_to_chr()
 	elif mode	== 'upos':
 		wiki.parse_to_upos()
+	elif mode	== 'monkey_word':
+		wiki.parse_to_monkey_word(seed=seed, total=100000)
+	elif mode	== 'monkey_chr':
+		wiki.parse_to_monkey_chr(seed=seed, total=100000)
+	elif mode == 'monkey_upos':
+		wiki.parse_to_moneky_upos(seed=seed, total=100000)
+
 
 	##	builds a word manifold to obtain the betti numbers for each dimension
 	wm	= WordManifold(parsed_text=wiki.parsed_sentences, n=n)
