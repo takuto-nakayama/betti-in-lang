@@ -156,9 +156,8 @@ class TextMonkey:
 			weights=prob,
 			k=total
 		)
-		monkey_doc = [''.join(monkey_doc)]
 
-		return monkey_doc
+		return [''.join(monkey_doc)]
 
 
 	def generate_monkey_word(self, seed:int, total:int):
@@ -170,9 +169,8 @@ class TextMonkey:
 			weights=prob,
 			k=total
 		)
-		monkey_doc = [monkey_doc]
 
-		return monkey_doc
+		return [tuple(monkey_doc)]
 
 
 	def generate_monkey_upos(self, seed:int, total:int):
@@ -184,9 +182,8 @@ class TextMonkey:
 			weights=prob,
 			k=total
 		)
-		monkey_doc = [monkey_doc]
 
-		return monkey_doc
+		return [tuple(monkey_doc)]
 
 
 
@@ -364,7 +361,7 @@ class WikiMonkey:
 		print(textwrap.dedent(f'''
 		{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} parsing into upos is done.
 		{'='*50}
-		text source:		{self.path}
+		text source:		{self.wiki_config}
 		language:		{self.lang}
 		'''))
 
@@ -378,9 +375,8 @@ class WikiMonkey:
 			weights=prob,
 			k=total
 		)
-		monkey_doc = [''.join(monkey_doc)]
 
-		return monkey_doc
+		return [''.join(monkey_doc)]
 
 
 	def generate_monkey_word(self, seed:int, total:int):
@@ -392,9 +388,8 @@ class WikiMonkey:
 			weights=prob,
 			k=total
 		)
-		monkey_doc = [monkey_doc]
 
-		return monkey_doc
+		return [tuple(monkey_doc)]
 
 
 	def generate_monkey_upos(self, seed:int, total:int):
@@ -406,9 +401,8 @@ class WikiMonkey:
 			weights=prob,
 			k=total
 		)
-		monkey_doc = [monkey_doc]
 
-		return monkey_doc
+		return [tuple(monkey_doc)]
 
 
 
