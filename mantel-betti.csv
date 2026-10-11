@@ -1,0 +1,67 @@
+X,Y,n,r,p,p_holm,significant
+euclidean-betti-bible-upos,wasserstein-betti-bible-upos,34,0.5427307525751002,0.0001,0.0066,True
+euclidean-betti-bible-word,wasserstein-betti-bible-word,34,0.3979443829462773,0.0001,0.0066,True
+euclidean-betti-wiki-chr,wasserstein-ratio-betti-wiki-chr ,34,0.5400116630282006,0.0001,0.0066,True
+euclidean-betti-wiki-upos,wasserstein-ratio-betti-wiki-upos,34,0.6798028431689725,0.0001,0.0066,True
+euclidean-betti-wiki-word,wasserstein-ratio-betti-wiki-word,34,0.5910867549866922,0.0001,0.0066,True
+wasserstein-betti-bible-chr ,wasserstein-ratio-betti-wiki-chr ,34,0.6663387514727007,0.0001,0.0066,True
+euclidean-betti-bible-chr,wasserstein-betti-bible-chr ,34,0.501035204637936,0.0002,0.012,True
+euclidean-betti-bible-upos,euclidean-betti-wiki-upos,34,0.565127477713829,0.0002,0.012,True
+wasserstein-betti-bible-word,wasserstein-ratio-betti-wiki-word,34,0.3147995714582442,0.0003,0.0174,True
+euclidean-betti-bible-chr,wasserstein-ratio-betti-wiki-chr ,34,0.4717677235889503,0.0005,0.0285,True
+wasserstein-betti-bible-chr ,wasserstein-betti-bible-upos,34,0.3905079063540522,0.0005,0.0285,True
+euclidean-betti-wiki-chr,wasserstein-betti-bible-chr ,34,0.4179925394989198,0.0006,0.032999999999999995,True
+wasserstein-betti-bible-upos,wasserstein-ratio-betti-wiki-upos,34,0.35183864183053754,0.0006,0.032999999999999995,True
+euclidean-betti-bible-upos,wasserstein-ratio-betti-wiki-upos,34,0.38509191771176277,0.0008,0.0424,True
+wasserstein-betti-bible-word,wasserstein-ratio-betti-wiki-upos,34,0.24314230760532635,0.0008,0.0424,True
+wasserstein-betti-bible-upos,wasserstein-ratio-betti-wiki-chr ,34,0.3355820350310377,0.0019,0.0969,False
+euclidean-betti-bible-chr,euclidean-betti-wiki-chr,34,0.4209832558063665,0.0024,0.12,False
+euclidean-betti-wiki-upos,wasserstein-ratio-betti-wiki-chr ,34,0.3805402102607462,0.0025,0.1225,False
+euclidean-betti-bible-upos,wasserstein-betti-bible-chr ,34,0.3620265981384502,0.0033,0.15839999999999999,False
+euclidean-betti-bible-word,wasserstein-ratio-betti-wiki-chr ,34,0.3567320684339733,0.0037,0.1739,False
+wasserstein-betti-bible-upos,wasserstein-betti-bible-word,34,0.19782622281553447,0.0047,0.2162,False
+euclidean-betti-wiki-upos,wasserstein-betti-bible-word,34,0.1990587127202218,0.0049,0.2205,False
+euclidean-betti-bible-chr,wasserstein-betti-bible-upos,34,0.32235625305828386,0.0059,0.2596,False
+euclidean-betti-wiki-upos,wasserstein-betti-bible-upos,34,0.30855014014158877,0.0061,0.26230000000000003,False
+euclidean-betti-wiki-chr,euclidean-betti-wiki-upos,34,0.34523093611433575,0.0069,0.2898,False
+euclidean-betti-wiki-upos,wasserstein-betti-bible-chr ,34,0.3293792467845608,0.0077,0.31570000000000004,False
+euclidean-betti-bible-chr,euclidean-betti-wiki-upos,34,0.3518213626440547,0.0091,0.364,False
+wasserstein-ratio-betti-wiki-chr ,wasserstein-ratio-betti-wiki-upos,34,0.26253659988744765,0.0105,0.40950000000000003,False
+euclidean-betti-bible-word,wasserstein-betti-bible-upos,34,0.2745398990352692,0.0107,0.40950000000000003,False
+euclidean-betti-bible-chr,euclidean-betti-bible-upos,34,0.3274320404318311,0.0108,0.40950000000000003,False
+euclidean-betti-bible-chr,wasserstein-ratio-betti-wiki-upos,34,0.2926551468209412,0.0121,0.4356,False
+euclidean-betti-bible-chr,euclidean-betti-bible-word,34,0.34166861503579105,0.0124,0.4356,False
+euclidean-betti-bible-upos,wasserstein-ratio-betti-wiki-chr ,34,0.2810611724469794,0.0137,0.4658,False
+euclidean-betti-bible-upos,wasserstein-betti-bible-word,34,0.14976168595863576,0.0228,0.7524000000000001,False
+euclidean-betti-bible-word,wasserstein-betti-bible-chr ,34,0.25968898748171815,0.0271,0.8672,False
+euclidean-betti-wiki-word,wasserstein-betti-bible-word,34,0.14824885549657718,0.0323,1.0,False
+euclidean-betti-wiki-chr,euclidean-betti-wiki-word,34,0.23286085382066124,0.0458,1.0,False
+wasserstein-betti-bible-chr ,wasserstein-ratio-betti-wiki-upos,34,0.18687424509515832,0.0486,1.0,False
+euclidean-betti-wiki-chr,wasserstein-ratio-betti-wiki-word,34,0.19466226154000907,0.0489,1.0,False
+euclidean-betti-bible-word,wasserstein-ratio-betti-wiki-upos,34,0.1912673416179801,0.0556,1.0,False
+wasserstein-ratio-betti-wiki-upos,wasserstein-ratio-betti-wiki-word,34,0.15182659605414472,0.0642,1.0,False
+euclidean-betti-wiki-chr,wasserstein-ratio-betti-wiki-upos,34,0.17020062311563255,0.0736,1.0,False
+euclidean-betti-wiki-word,wasserstein-ratio-betti-wiki-upos,34,0.1737858488591166,0.0767,1.0,False
+euclidean-betti-wiki-word,wasserstein-betti-bible-upos,34,0.1664160236452368,0.0783,1.0,False
+wasserstein-betti-bible-upos,wasserstein-ratio-betti-wiki-word,34,0.12489719660088244,0.101,1.0,False
+euclidean-betti-bible-upos,euclidean-betti-wiki-chr,34,0.16731681025694004,0.1028,1.0,False
+wasserstein-betti-bible-word,wasserstein-ratio-betti-wiki-chr ,34,0.08350095550587731,0.1094,1.0,False
+euclidean-betti-wiki-upos,wasserstein-ratio-betti-wiki-word,34,0.13693326246707027,0.1106,1.0,False
+wasserstein-betti-bible-chr ,wasserstein-betti-bible-word,34,0.08519403510851313,0.1136,1.0,False
+euclidean-betti-bible-word,euclidean-betti-wiki-chr,34,0.1637264190697308,0.1151,1.0,False
+euclidean-betti-wiki-chr,wasserstein-betti-bible-upos,34,0.13396744607454258,0.1159,1.0,False
+euclidean-betti-bible-upos,euclidean-betti-bible-word,34,0.15532788333709416,0.1183,1.0,False
+euclidean-betti-bible-upos,euclidean-betti-wiki-word,34,0.15376622017296077,0.1235,1.0,False
+euclidean-betti-wiki-upos,euclidean-betti-wiki-word,34,0.1568768367910089,0.1248,1.0,False
+euclidean-betti-wiki-chr,wasserstein-betti-bible-word,34,0.07136035256628566,0.1586,1.0,False
+euclidean-betti-bible-word,euclidean-betti-wiki-upos,34,0.12920881714057347,0.1669,1.0,False
+wasserstein-ratio-betti-wiki-chr ,wasserstein-ratio-betti-wiki-word,34,0.08438003800679118,0.1868,1.0,False
+euclidean-betti-bible-word,wasserstein-ratio-betti-wiki-word,34,0.09316197200329501,0.1938,1.0,False
+euclidean-betti-bible-chr,wasserstein-betti-bible-word,34,0.0555692734437902,0.2214,1.0,False
+euclidean-betti-bible-upos,wasserstein-ratio-betti-wiki-word,34,0.061483393098423454,0.2643,1.0,False
+wasserstein-betti-bible-chr ,wasserstein-ratio-betti-wiki-word,34,0.04048734283090419,0.3095,1.0,False
+euclidean-betti-wiki-word,wasserstein-ratio-betti-wiki-chr ,34,0.05058396700640788,0.3193,1.0,False
+euclidean-betti-wiki-word,wasserstein-betti-bible-chr ,34,0.04048265314974048,0.3498,1.0,False
+euclidean-betti-bible-chr,euclidean-betti-wiki-word,34,0.04120093847956523,0.3708,1.0,False
+euclidean-betti-bible-chr,wasserstein-ratio-betti-wiki-word,34,-0.011205342700004624,0.5056,1.0,False
+euclidean-betti-bible-word,euclidean-betti-wiki-word,34,-0.04585976092151517,0.6108,1.0,False
