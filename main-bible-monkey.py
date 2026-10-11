@@ -21,7 +21,8 @@ if __name__ == '__main__':
 	parser.add_argument('--n', type=int, default=7, help='max n-gram size.')
 	parser.add_argument('--faster', action='store_false', help='If true, the process uses the approximate in getting betti number.')
 	parser.add_argument('--total', type=int, default=100000)
-	parser.add_argument('--num_roop', type=int, default=10)
+	parser.add_argument('--loop_start', type=int, default=1)
+	parser.add_argument('--loop_end', type=int, default=10)
 
 	args = parser.parse_args()
 	data_file_name	= args.data_file_name
@@ -31,7 +32,8 @@ if __name__ == '__main__':
 	n				= args.n
 	faster			= args.faster
 	total			= args.total
-	num_roop		= args.num_roop
+	loop_start		= args.loop_start
+	loop_end		= args.loop_end
 
 
 	#	main processes
@@ -44,7 +46,7 @@ if __name__ == '__main__':
 	elif mode == 'monkey_upos':
 		tm.count_upos()
 
-	for i in range(1,num_roop+1):
+	for i in range(loop_start, loop_end+1):
 		if mode == 'monkey_chr':
 			monkeyed_text = tm.generate_monkey_chr(seed=i, total=total)
 		elif mode == 'monkey_word':
